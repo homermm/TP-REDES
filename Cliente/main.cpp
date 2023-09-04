@@ -22,18 +22,18 @@ public:
         cout << "Conectado al Servidor!" << endl;
     }
 
-    void Enviar() {
-        cout << "Escribe el mensaje a enviar: ";
-        cin.getline(buffer, sizeof(buffer));
-        send(server, buffer, sizeof(buffer), 0);
-        memset(buffer, 0, sizeof(buffer));
-        cout << "Mensaje enviado!" << endl;
+    void Enviar(const string &mensaje) {
+        send(server, mensaje.c_str(), mensaje.size(), 0);
     }
 
     string Recibir() {
-        recv(server, buffer, sizeof(buffer), 0);
-        cout << "El servidor dice: " << buffer << endl;
-        string mensaje(buffer);
+        string mensaje;
+        int bytesRecibidos = recv(server, buffer, sizeof(buffer), 0);
+        if (bytesRecibidos <= 0) {
+            return "";
+        }
+        mensaje.append(buffer, bytesRecibidos);
+        cout << "El servidor dice: " << mensaje << endl;
         memset(buffer, 0, sizeof(buffer));
         return mensaje;
     }
@@ -50,15 +50,24 @@ public:
     }
 };
 
+void IniciarMenu(Client *Cliente);
+
 int main() {
-    char serverIP[16];
-    cout << "Ingrese la IP del servidor: ";
-    cin.getline(serverIP, sizeof(serverIP));
+    char serverIP[] = "127.0.0.1"; // Cambia la IP del servidor si es necesario
     Client *Cliente = new Client(serverIP);
-    while (true) {
-        Cliente->Enviar();
-        string mensaje = Cliente->Recibir();
+    IniciarMenu(Cliente);
+    while(true){
+        string opcion;
+        getline(cin, opcion);
+        Cliente->Enviar(opcion);
+        Cliente->Recibir();
     }
     delete Cliente;
     return 0;
+}
+
+void IniciarMenu(Client *Cliente) {
+    cout << "\n\nMenu de Opciones" << endl;
+    cout << "1. Traductor" << endl;
+    cout << "0. SALIR" << endl;
 }

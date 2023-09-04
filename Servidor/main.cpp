@@ -22,7 +22,7 @@ public:
         bind(server, (SOCKADDR *)&serverAddr, sizeof(serverAddr));
         listen(server, 0);
 
-        cout << "Escuchando para conexiones entrantes." << endl;
+        cout << "Escuchando para conexiones entrantes en el puerto 5555." << endl;
         int clientAddrSize = sizeof(clientAddr);
         if ((client = accept(server, (SOCKADDR *)&clientAddr, &clientAddrSize)) != INVALID_SOCKET) {
             cout << "Cliente conectado!" << endl;
@@ -30,7 +30,12 @@ public:
     }
 
     string Recibir() {
-        recv(client, buffer, sizeof(buffer), 0);
+        int bytesRecibidos = recv(client, buffer, sizeof(buffer), 0);
+        if (bytesRecibidos <= 0) {
+            CerrarSocket();
+            return "";
+        }
+
         cout << "El cliente dice: " << buffer << endl;
         string mensaje(buffer);
         memset(buffer, 0, sizeof(buffer));
@@ -38,11 +43,16 @@ public:
     }
 
     void Enviar(const string &mensaje) {
-        cout << "Escribe el mensaje a enviar: ";
-        cin.getline(buffer, sizeof(buffer));
-        send(client, buffer, sizeof(buffer), 0);
-        memset(buffer, 0, sizeof(buffer));
-        cout << "Mensaje enviado!" << endl;
+        send(client, mensaje.c_str(), mensaje.size(), 0);
+        cout << "Mensaje enviado: " << mensaje << endl;
+    }
+
+    void Traducir(string mensaje) {
+        // Traduce el mensaje a mayúsculas
+        for (char &c : mensaje) {
+            c = toupper(c);
+        }
+        Enviar(mensaje);
     }
 
     void CerrarSocket() {
@@ -56,12 +66,25 @@ public:
     }
 };
 
+void Traductor(Server *Servidor);
+
 int main() {
     Server *Servidor = new Server();
     while (true) {
-        string mensaje = Servidor->Recibir();
-        Servidor->Enviar(mensaje);
+        string opcion = Servidor->Recibir();
+
+        if (opcion.empty()) break; // El cliente se ha desconectado, sale del bucle
+
+        if (opcion == "1") Traductor(Servidor);
+        if (opcion == "0") Servidor->Enviar("Funcion todavia no implementada");
+        if (opcion != "1" && opcion != "0") Servidor->Enviar("Inserte una opcion (Disponibles 0 y 1)");
     }
     delete Servidor;
     return 0;
+}
+
+void Traductor(Server *Servidor){
+    Servidor->Enviar("Inserte una palabra en español");
+    string mensaje = Servidor->Recibir();
+    Servidor->Traducir(mensaje);
 }
