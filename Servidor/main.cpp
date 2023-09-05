@@ -47,14 +47,6 @@ public:
         cout << "Mensaje enviado: " << mensaje << endl;
     }
 
-    void Traducir(string mensaje) {
-        // Traduce el mensaje a mayúsculas
-        for (char &c : mensaje) {
-            c = toupper(c);
-        }
-        Enviar(mensaje);
-    }
-
     void CerrarSocket() {
         closesocket(client);
         cout << "Socket cerrado, cliente desconectado." << endl;
@@ -67,6 +59,7 @@ public:
 };
 
 void Traductor(Server *Servidor);
+string Traducir(string mensaje);
 
 int main() {
     Server *Servidor = new Server();
@@ -86,5 +79,13 @@ int main() {
 void Traductor(Server *Servidor){
     Servidor->Enviar("Inserte una palabra en español");
     string mensaje = Servidor->Recibir();
-    Servidor->Traducir(mensaje);
+    string traduccion = Traducir(mensaje);
+    Servidor->Enviar(traduccion);
+}
+string Traducir(string mensaje) {
+        // Traduce el mensaje a minusculas
+        for (char &c : mensaje) {
+            c = toupper(c);
+        }
+    return mensaje;
 }
