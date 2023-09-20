@@ -1,3 +1,4 @@
 dog:perro
 cat:gato
 apple:manzana
+homer:capo

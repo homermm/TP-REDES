@@ -60,6 +60,7 @@ public:
     }
 
     //!FUNCIONES EXTRA
+    //!TRADUCTOR
     void Traductor() {
     Enviar("Inserte una palabra en ingles a traducir");
     string palabraIngles = Recibir();
@@ -88,8 +89,53 @@ public:
             }
             archivo.close();
         }
-        return "No fue posible encontrar la traducción para:"+palabraIngles;
+        return "No fue posible encontrar la traduccion para:"+palabraIngles;
+
     }
+    //!INSERTAR NUEVA TRADUCCION
+    /*void InsertarNuevaTraduccion(){
+        Enviar("Ingrese nueva traduccion (PalabraIngles:PalabraEspanol):");
+        string palabraIngles = Recibir();
+        //palabraIngles = ConvertirAMinusculas(PalabraIngles); //!NO IMPLEMENTADA
+
+        //IF VALIDANDO FORMATO
+
+        //Verifico si la palabra ya existe en las traducciones
+        if(BuscarTraduccionEnArchivo(palabraIngles) == "No fue posible encontrar la traduccion para:"+palabraIngles){
+            Enviar("Ya existe una traduccion para "+palabraIngles+": "+BuscarTraduccionEnArchivo(palabraIngles));
+        }
+        else{
+
+        }
+    }*/
+    void InsertarNuevaTraduccion() {
+    Enviar("Ingrese nueva traducción (PalabraIngles:PalabraEspanol):");
+    string nuevaTraduccion = Recibir();
+
+    // Verificar el formato de la nueva traducción
+    size_t separadorPos = nuevaTraduccion.find(':');
+    if (separadorPos == std::string::npos) {
+        Enviar("No fue posible insertar la traducción. El formato de inserción debe ser PalabraIngles:PalabraEspanol");
+        return;
+    }
+
+    // Obtener la palabra en inglés y la traducción
+    string palabraIngles = nuevaTraduccion.substr(0, separadorPos);
+    string traduccion = nuevaTraduccion.substr(separadorPos + 1);
+
+    // Agregar la nueva traducción al archivo en líneas separadas
+    ofstream archivoSalida("traducciones.txt", std::ios::app); // Abre el archivo en modo de apertura al final
+    if (!archivoSalida.is_open()) {
+        Enviar("Error al abrir el archivo de diccionario para inserción.");
+        return;
+    }
+
+    archivoSalida << palabraIngles << ":" << traduccion << std::endl;
+    archivoSalida.close();
+
+    Enviar("Nueva traducción insertada correctamente");
+}
+
 };
 
 
@@ -101,12 +147,12 @@ int main() {
         if (opcion.empty()) break; // El cliente se ha desconectado, sale del bucle
 
         else if (opcion == "1") Servidor->Traductor();
-        else if (opcion == "2") Servidor->Enviar("Funcion todavia no implementada"); // funcion nueva trad
+        else if (opcion == "2") Servidor->InsertarNuevaTraduccion(); // funcion nueva trad
         else if (opcion == "3") Servidor->Enviar("Funcion todavia no implementada"); // funcion usuarios
         else if (opcion == "4") Servidor->Enviar("Funcion todavia no implementada"); // funcion registro act
         else if (opcion == "5") Servidor->Enviar("Funcion todavia no implementada"); // funcion cerrar sesion
         else if (opcion == "0") Servidor->Enviar("Funcion todavia no implementada"); // funcion salir
-        else Servidor->Enviar("Inserte una opcion (Disponible 1)");
+        else Servidor->Enviar("Inserte una opcion (Disponible 1 y 2)");
     }
     delete Servidor;
     return 0;
