@@ -94,7 +94,7 @@ public:
     return "No fue posible encontrar la traducción para:" + palabraIngles;
 }
     //!INSERTAR NUEVA TRADUCCION
-    void InsertarNuevaTraduccion() {
+void InsertarNuevaTraduccion() {
     Enviar("Ingrese nueva traducción (PalabraIngles:PalabraEspanol):");
     string nuevaTraduccion = Recibir();
 
@@ -132,7 +132,7 @@ public:
         archivo.close();
     }
 
-    // Agregar la nueva traducción al archivo en líneas separadas
+    // Agregar la nueva traducción al archivo en una línea separada con salto de línea
     ofstream archivoSalida("traducciones.txt", std::ios::app); // Abre el archivo en modo de apertura al final
     if (!archivoSalida.is_open()) {
         Enviar("Error al abrir el archivo de diccionario para inserción.");

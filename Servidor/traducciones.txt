@@ -1,6 +1,4 @@
 dog:perro
 cat:gato
 apple:manzana
-homer:capo
-dog:perro
-diana:diana
+university:universidad
