@@ -2,6 +2,7 @@
 #include <cstring>
 #include <winsock2.h>
 #include <fstream>
+#include <algorithm>  // Para transformar a minúsculas
 
 using namespace std;
 
@@ -73,41 +74,26 @@ public:
     }
 
     string BuscarTraduccionEnArchivo(const string &palabraIngles) {
-        ifstream archivo("traducciones.txt");
-        if (archivo.is_open()) {
-            string linea;
-            while (getline(archivo, linea)) {
-                size_t pos = linea.find(":");
-                if (pos != string::npos) {
-                    string palabra = linea.substr(0, pos);
-                    string traduccion = linea.substr(pos + 1);
-                    if (palabra == palabraIngles) {
-                        archivo.close();
-                        return palabraIngles + " en ingles es " + traduccion + " en espanol";
-                    }
+    ifstream archivo("traducciones.txt");
+    if (archivo.is_open()) {
+        string palabraInglesMinusculas = ConvertirAMinusculas(palabraIngles); // Convertir la palabra a minúsculas
+        string linea;
+        while (getline(archivo, linea)) {
+            size_t pos = linea.find(":");
+            if (pos != string::npos) {
+                string palabra = linea.substr(0, pos);
+                string traduccion = linea.substr(pos + 1);
+                if (ConvertirAMinusculas(palabra) == palabraInglesMinusculas) { // Comparar en minúsculas
+                    archivo.close();
+                    return palabraIngles + " en ingles es " + traduccion + " en espanol";
                 }
             }
-            archivo.close();
         }
-        return "No fue posible encontrar la traduccion para:"+palabraIngles;
-
+        archivo.close();
     }
+    return "No fue posible encontrar la traducción para:" + palabraIngles;
+}
     //!INSERTAR NUEVA TRADUCCION
-    /*void InsertarNuevaTraduccion(){
-        Enviar("Ingrese nueva traduccion (PalabraIngles:PalabraEspanol):");
-        string palabraIngles = Recibir();
-        //palabraIngles = ConvertirAMinusculas(PalabraIngles); //!NO IMPLEMENTADA
-
-        //IF VALIDANDO FORMATO
-
-        //Verifico si la palabra ya existe en las traducciones
-        if(BuscarTraduccionEnArchivo(palabraIngles) == "No fue posible encontrar la traduccion para:"+palabraIngles){
-            Enviar("Ya existe una traduccion para "+palabraIngles+": "+BuscarTraduccionEnArchivo(palabraIngles));
-        }
-        else{
-
-        }
-    }*/
     void InsertarNuevaTraduccion() {
     Enviar("Ingrese nueva traducción (PalabraIngles:PalabraEspanol):");
     string nuevaTraduccion = Recibir();
@@ -123,6 +109,29 @@ public:
     string palabraIngles = nuevaTraduccion.substr(0, separadorPos);
     string traduccion = nuevaTraduccion.substr(separadorPos + 1);
 
+    // Convertir las palabras a minúsculas
+    palabraIngles = ConvertirAMinusculas(palabraIngles);
+    traduccion = ConvertirAMinusculas(traduccion);
+
+    // Verificar si la palabra ya existe en las traducciones
+    ifstream archivo("traducciones.txt");
+    if (archivo.is_open()) {
+        string linea;
+        while (getline(archivo, linea)) {
+            size_t pos = linea.find(":");
+            if (pos != string::npos) {
+                string palabraExistente = linea.substr(0, pos);
+                string traduccionExistente = linea.substr(pos + 1);
+                if (ConvertirAMinusculas(palabraExistente) == palabraIngles) {
+                    archivo.close();
+                    Enviar("Ya existe una traducción para " + palabraIngles + ": " + traduccionExistente);
+                    return;
+                }
+            }
+        }
+        archivo.close();
+    }
+
     // Agregar la nueva traducción al archivo en líneas separadas
     ofstream archivoSalida("traducciones.txt", std::ios::app); // Abre el archivo en modo de apertura al final
     if (!archivoSalida.is_open()) {
@@ -134,6 +143,13 @@ public:
     archivoSalida.close();
 
     Enviar("Nueva traducción insertada correctamente");
+}
+
+//!FUNCIONES AUXILIARES
+string ConvertirAMinusculas(const string &cadena) {
+    string cadenaMinusculas = cadena;
+    transform(cadenaMinusculas.begin(), cadenaMinusculas.end(), cadenaMinusculas.begin(), ::tolower);
+    return cadenaMinusculas;
 }
 
 };
