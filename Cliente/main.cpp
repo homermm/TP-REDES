@@ -44,21 +44,36 @@ public:
         cout << "Socket cerrado." << endl << endl;
     }
 
+    void MostrarMenu()
+	{
+		//system("cls");	// Borrar pantalla en Windows
+		cout << "\n\nMenu de Opciones" << endl;
+		cout << "1. Traducir" << endl;
+		cout << "2. Nueva traducción" << endl;
+		cout << "3. Usuarios" << endl;
+		cout << "4. Ver registro de actividades" << endl;
+		cout << "5. Cerrar sesión" << endl;
+		cout << "0. SALIR" << endl;
+	}
+
     ~Client() {
         closesocket(server);
         WSACleanup();
     }
 };
 
-void IniciarMenu(Client *Cliente);
+
 
 int main() {
     char serverIP[] = "127.0.0.1"; // Cambia la IP del servidor si es necesario
     Client *Cliente = new Client(serverIP);
-    IniciarMenu(Cliente);
+
+    Cliente->MostrarMenu();
     while(true){
+        //Cliente->MostrarMenu();
         string opcion;
         getline(cin, opcion);
+
         Cliente->Enviar(opcion);
         Cliente->Recibir();
     }
@@ -66,8 +81,4 @@ int main() {
     return 0;
 }
 
-void IniciarMenu(Client *Cliente) {
-    cout << "\n\nMenu de Opciones" << endl;
-    cout << "1. Traductor" << endl;
-    cout << "0. SALIR" << endl;
-}
+

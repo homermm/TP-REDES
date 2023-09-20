@@ -29,6 +29,7 @@ public:
         }
     }
 
+    //!FUNCIONES PRIMITIVAS
     string Recibir() {
         int bytesRecibidos = recv(client, buffer, sizeof(buffer), 0);
         if (bytesRecibidos <= 0) {
@@ -56,10 +57,23 @@ public:
         closesocket(server);
         WSACleanup();
     }
+
+    //!FUNCIONES EXTRA
+    void Traductor(){
+    Enviar("Inserte una ingles a traducir");
+    string mensaje = Recibir();
+    string traduccion = Traducir(mensaje);
+    Enviar(traduccion);
+    }
+    string Traducir(string mensaje) {
+    // Traduce el mensaje a mayusculas
+        for (char &c : mensaje) {
+            c = toupper(c);
+        }
+    return mensaje;
+    }
 };
 
-void Traductor(Server *Servidor);
-string Traducir(string mensaje);
 
 int main() {
     Server *Servidor = new Server();
@@ -68,24 +82,17 @@ int main() {
 
         if (opcion.empty()) break; // El cliente se ha desconectado, sale del bucle
 
-        if (opcion == "1") Traductor(Servidor);
-        if (opcion == "0") Servidor->Enviar("Funcion todavia no implementada");
-        if (opcion != "1" && opcion != "0") Servidor->Enviar("Inserte una opcion (Disponibles 0 y 1)");
+        else if (opcion == "1") Servidor->Traductor();
+        else if (opcion == "2") Servidor->Enviar("Funcion todavia no implementada"); // funcion nueva trad
+        else if (opcion == "3") Servidor->Enviar("Funcion todavia no implementada"); // funcion usuarios
+        else if (opcion == "4") Servidor->Enviar("Funcion todavia no implementada"); // funcion registro act
+        else if (opcion == "5") Servidor->Enviar("Funcion todavia no implementada"); // funcion cerrar sesion
+        else if (opcion == "0") Servidor->Enviar("Funcion todavia no implementada"); // funcion salir
+        else Servidor->Enviar("Inserte una opcion (Disponible 1)");
     }
     delete Servidor;
     return 0;
 }
 
-void Traductor(Server *Servidor){
-    Servidor->Enviar("Inserte una palabra en español");
-    string mensaje = Servidor->Recibir();
-    string traduccion = Traducir(mensaje);
-    Servidor->Enviar(traduccion);
-}
-string Traducir(string mensaje) {
-        // Traduce el mensaje a minusculas
-        for (char &c : mensaje) {
-            c = toupper(c);
-        }
-    return mensaje;
-}
+
+
