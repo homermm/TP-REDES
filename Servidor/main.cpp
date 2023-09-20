@@ -88,7 +88,7 @@ public:
             }
             archivo.close();
         }
-        return "Palabra no encontrada en el diccionario";
+        return "No fue posible encontrar la traducción para:"+palabraIngles;
     }
 };
 
