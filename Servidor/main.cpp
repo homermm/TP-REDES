@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstring>
 #include <winsock2.h>
+#include <fstream>
 
 using namespace std;
 
@@ -59,18 +60,35 @@ public:
     }
 
     //!FUNCIONES EXTRA
-    void Traductor(){
-    Enviar("Inserte una ingles a traducir");
-    string mensaje = Recibir();
-    string traduccion = Traducir(mensaje);
+    void Traductor() {
+    Enviar("Inserte una palabra en ingles a traducir");
+    string palabraIngles = Recibir();
+
+    // Buscar la traducción en el archivo y enviarla
+    string traduccion = BuscarTraduccionEnArchivo(palabraIngles);
+
+    // Enviar la traducción al cliente
     Enviar(traduccion);
     }
-    string Traducir(string mensaje) {
-    // Traduce el mensaje a mayusculas
-        for (char &c : mensaje) {
-            c = toupper(c);
+
+    string BuscarTraduccionEnArchivo(const string &palabraIngles) {
+        ifstream archivo("traducciones.txt");
+        if (archivo.is_open()) {
+            string linea;
+            while (getline(archivo, linea)) {
+                size_t pos = linea.find(":");
+                if (pos != string::npos) {
+                    string palabra = linea.substr(0, pos);
+                    string traduccion = linea.substr(pos + 1);
+                    if (palabra == palabraIngles) {
+                        archivo.close();
+                        return palabraIngles + " en ingles es " + traduccion + " en espanol";
+                    }
+                }
+            }
+            archivo.close();
         }
-    return mensaje;
+        return "Palabra no encontrada en el diccionario";
     }
 };
 
