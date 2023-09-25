@@ -80,12 +80,13 @@ int main() {
     cout << "Ingrese el puerto del servidor: ";
     cin >> serverPort;
 
+    cin.ignore(); // Limpia el buffer de entrada
+
     Client* Cliente = new Client(serverIP.c_str(), serverPort);
 
     Cliente->MostrarMenu();
     while (true) {
         string opcion;
-        cin.ignore(); // Limpia el buffer de entrada
         getline(cin, opcion);
 
         Cliente->Enviar(opcion);

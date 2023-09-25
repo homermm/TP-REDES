@@ -3,3 +3,4 @@ cat:gato
 apple:manzana
 university:universidad
 test:prueba
+niversity:universidad
