@@ -79,7 +79,6 @@ class Client {
     cout << "3. Usuarios" << endl;
     cout << "4. Ver registro de actividades" << endl;
     cout << "5. Cerrar sesión" << endl;
-    cout << "0. SALIR" << endl;
   }
 
   ~Client() {
@@ -114,9 +113,8 @@ int main() {
     getline(cin, opcion);
 
     Cliente -> Enviar(opcion);
-    if (opcion == "/salir") {
-      Cliente -> MostrarMenu();
-    }
+    if (opcion == "/salir") Cliente -> MostrarMenu();
+
     Cliente -> Recibir();
   }
 

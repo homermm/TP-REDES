@@ -223,7 +223,6 @@ public:
 int main() {
     Server* Servidor = new Server();
     while (true) {
-        //Servidor->AceptarCliente();
         if(Servidor->AceptarCliente()){
             while (true) {
                 string opcion = Servidor->Recibir();
@@ -234,8 +233,7 @@ int main() {
                 else if (opcion == "2") Servidor->InsertarNuevaTraduccion();
                 else if (opcion == "3") Servidor->Enviar("Función todavía no implementada");
                 else if (opcion == "4") Servidor->Enviar("Función todavía no implementada");
-                else if (opcion == "5") Servidor->Enviar("Función todavía no implementada");
-                else if (opcion == "0") Servidor->Enviar("Función todavía no implementada");
+                else if (opcion == "5") break;
                 else Servidor->Enviar("Inserte una opción (Disponible 1 y 2)");
             }
         }
