@@ -2,37 +2,40 @@
 #include <cstring>
 #include <winsock2.h>
 #include <fstream>
-#include <algorithm>  // Para transformar a min�sculas
+#include <algorithm>  // Para transformar a minúsculas
 #include <fstream>
 #include <sstream>
 
 using namespace std;
 
 class Server {
-  public: WSADATA WSAData;
-  SOCKET server,
-  client;
-  SOCKADDR_IN serverAddr,
-  clientAddr;
-  char buffer[1024];
+public:
+    WSADATA WSAData;
+    SOCKET server;
+    SOCKET client; // Cambiado a SOCKET en lugar de SOCKET client;
+    SOCKADDR_IN serverAddr;
+    SOCKADDR_IN clientAddr;
+    char buffer[1024];
 
-  Server() {
-    WSAStartup(MAKEWORD(2, 0), & WSAData);
-    server = socket(AF_INET, SOCK_STREAM, 0);
+    Server() {
+        WSAStartup(MAKEWORD(2, 0), &WSAData);
+        server = socket(AF_INET, SOCK_STREAM, 0);
 
-    serverAddr.sin_addr.s_addr = INADDR_ANY;
-    serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(5555);
+        serverAddr.sin_addr.s_addr = INADDR_ANY;
+        serverAddr.sin_family = AF_INET;
+        serverAddr.sin_port = htons(5555);
 
-    bind(server, (SOCKADDR * ) & serverAddr, sizeof(serverAddr));
-    listen(server, 0);
+        bind(server, (SOCKADDR*)&serverAddr, sizeof(serverAddr));
+        listen(server, 0);
 
-    cout << "Escuchando para conexiones entrantes en el puerto 5555." << endl;
-    int clientAddrSize = sizeof(clientAddr);
-    if ((client = accept(server, (SOCKADDR * ) & clientAddr, & clientAddrSize)) != INVALID_SOCKET) {
-      cout << "Cliente conectado!" << endl;
+        cout << "Escuchando para conexiones entrantes en el puerto 5555." << endl;
+
+        // Aceptar la conexión del cliente antes de entrar en el bucle principal
+        int clientAddrSize = sizeof(clientAddr);
+        if ((client = accept(server, (SOCKADDR*)&clientAddr, &clientAddrSize)) != INVALID_SOCKET) {
+            cout << "Cliente conectado!" << endl;
+        }
     }
-  }
 
   //!FUNCIONES PRIMITIVAS
   string Recibir() {
@@ -54,14 +57,19 @@ class Server {
   }
 
   void CerrarSocket() {
-    closesocket(client);
-    cout << "Socket cerrado, cliente desconectado." << endl;
-  }
+        closesocket(client);
+        cout << "Socket cerrado, cliente desconectado." << endl;
+        // Aceptar una nueva conexión antes de salir de esta función
+        int clientAddrSize = sizeof(clientAddr);
+        if ((client = accept(server, (SOCKADDR*)&clientAddr, &clientAddrSize)) != INVALID_SOCKET) {
+            cout << "Cliente conectado!" << endl;
+        }
+    }
 
-  ~Server() {
-    closesocket(server);
-    WSACleanup();
-  }
+    ~Server() {
+        closesocket(server);
+        WSACleanup();
+    }
 
   //!FUNCIONES EXTRA
   //!TRADUCTOR
@@ -168,19 +176,19 @@ class Server {
 
   //!FUNCION USUARIOS
   void AceptarCliente() {
-    Enviar("Bienvenido al servidor. Por favor, ingrese su nombre de usuario:");
-    string usuario = Recibir();
-    Enviar("Ingrese su contraseña:");
-    string contrasena = Recibir();
+        Enviar("Bienvenido al servidor. Por favor, ingrese su nombre de usuario:");
+        string usuario = Recibir();
+        Enviar("Ingrese su contraseña:");
+        string contrasena = Recibir();
 
-    // Verifica si el usuario/contraseña es valido
-    if (ValidarCredenciales(usuario, contrasena)) {
-      Enviar("Autenticación exitosa. ¡Bienvenido!");
-    } else {
-      Enviar("Datos de usuario incorrectos. La conexión se cerrará.");
-      CerrarSocket();
+        // Verifica si el usuario/contraseña es valido
+        if (ValidarCredenciales(usuario, contrasena)) {
+            Enviar("Autenticación exitosa. ¡Bienvenido!");
+        } else {
+            Enviar("Datos de usuario incorrectos. La conexión se cerrará.");
+            CerrarSocket();
+        }
     }
-  }
 
   bool ValidarCredenciales(string usuario, string contrasena) {
     ifstream archivo("credenciales.txt");
@@ -211,23 +219,23 @@ class Server {
 };
 
 int main() {
-  Server * Servidor = new Server();
-  while (true) {
-    Servidor -> AceptarCliente();
+    Server* Servidor = new Server();
     while (true) {
-      string opcion = Servidor -> Recibir();
+        Servidor->AceptarCliente();
+        while (true) {
+            string opcion = Servidor->Recibir();
 
-      if (opcion.empty()) break; // El cliente se ha desconectado, sale del bucle
+            if (opcion.empty()) break; // El cliente se ha desconectado, sale del bucle
 
-      else if (opcion == "1") Servidor -> Traductor();
-      else if (opcion == "2") Servidor -> InsertarNuevaTraduccion(); // funcion nueva trad
-      else if (opcion == "3") Servidor -> Enviar("Funcion todavia no implementada"); // funcion usuarios
-      else if (opcion == "4") Servidor -> Enviar("Funcion todavia no implementada"); // funcion registro act
-      else if (opcion == "5") Servidor -> Enviar("Funcion todavia no implementada"); // funcion cerrar sesion
-      else if (opcion == "0") Servidor -> Enviar("Funcion todavia no implementada"); // funcion salir
-      else Servidor -> Enviar("Inserte una opcion (Disponible 1 y 2)");
+            else if (opcion == "1") Servidor->Traductor();
+            else if (opcion == "2") Servidor->InsertarNuevaTraduccion();
+            else if (opcion == "3") Servidor->Enviar("Función todavía no implementada");
+            else if (opcion == "4") Servidor->Enviar("Función todavía no implementada");
+            else if (opcion == "5") Servidor->Enviar("Función todavía no implementada");
+            else if (opcion == "0") Servidor->Enviar("Función todavía no implementada");
+            else Servidor->Enviar("Inserte una opción (Disponible 1 y 2)");
+        }
     }
-  }
-  delete Servidor;
-  return 0;
+    delete Servidor;
+    return 0;
 }
