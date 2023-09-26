@@ -1,11 +1,7 @@
 #include <iostream>
-
 #include <cstring>
-
 #include <winsock2.h>
-
 #include <fstream>
-
 #include <algorithm>  // Para transformar a min�sculas
 
 using namespace std;
@@ -72,9 +68,7 @@ class Server {
 
     while (true) {
       string mensaje = Recibir();
-      if (mensaje.empty()) {
-        break; // El cliente se ha desconectado, sale del bucle interno
-      }
+      if (mensaje.empty()) break; // El cliente se ha desconectado, sale del bucle interno
 
       if (mensaje == "/salir") {
         Enviar("Has vuelto al menu principal.");
@@ -92,17 +86,17 @@ class Server {
   }
   //!INSERTAR NUEVA TRADUCCION
   void InsertarNuevaTraduccion() {
-    Enviar("Ingrese nueva traducci�n (PalabraIngles:PalabraEspanol):");
+    Enviar("Ingrese nueva traduccion (PalabraIngles:PalabraEspanol):");
     string nuevaTraduccion = Recibir();
 
-    // Verificar el formato de la nueva traducci�n
+    // Verificar el formato de la nueva traduccion
     size_t separadorPos = nuevaTraduccion.find(':');
     if (separadorPos == std::string::npos) {
-      Enviar("No fue posible insertar la traducci�n. El formato de inserci�n debe ser PalabraIngles:PalabraEspanol");
+      Enviar("No fue posible insertar la traduccion. El formato de insercion debe ser PalabraIngles:PalabraEspanol");
       return;
     }
 
-    // Obtener la palabra en ingl�s y la traducci�n
+    // Obtener la palabra en ingles y la traduccion
     string palabraIngles = nuevaTraduccion.substr(0, separadorPos);
     string traduccion = nuevaTraduccion.substr(separadorPos + 1);
 
@@ -132,14 +126,14 @@ class Server {
     // Agregar la nueva traducci�n al archivo en una l�nea separada con salto de l�nea
     ofstream archivoSalida("traducciones.txt", std::ios::app); // Abre el archivo en modo de apertura al final
     if (!archivoSalida.is_open()) {
-      Enviar("Error al abrir el archivo de diccionario para inserci�n.");
+      Enviar("Error al abrir el archivo de diccionario para insercion.");
       return;
     }
 
     archivoSalida << palabraIngles << ":" << traduccion << std::endl;
     archivoSalida.close();
 
-    Enviar("Nueva traducci�n insertada correctamente");
+    Enviar("Nueva traduccion insertada correctamente");
   }
 
   //!FUNCIONES AUXILIARES
@@ -169,22 +163,47 @@ class Server {
     }
     return "No fue posible encontrar la traducci�n para:" + palabraIngles;
   }
+
+  //!FUNCION USUARIOS
+  void AceptarCliente() {
+    Enviar("Bienvenido al servidor. Por favor, ingrese su nombre de usuario:");
+    string usuario = Recibir();
+    Enviar("Ingrese su contraseña:");
+    string contrasena = Recibir();
+
+    // Verifica si el usuario/contraseña es valido
+    if (ValidarCredenciales(usuario, contrasena)) {
+      Enviar("Autenticación exitosa. ¡Bienvenido!");
+    } else {
+      Enviar("Datos de usuario incorrectos. La conexión se cerrará.");
+      CerrarSocket();
+    }
+  }
+
+  bool ValidarCredenciales(string usuario, string contrasena) {
+    //funcion no desarrollada
+    return true;
+  }
+
 };
 
 int main() {
   Server * Servidor = new Server();
   while (true) {
-    string opcion = Servidor -> Recibir();
+    Servidor -> AceptarCliente();
+    while (true) {
+      string opcion = Servidor -> Recibir();
 
-    if (opcion.empty()) break; // El cliente se ha desconectado, sale del bucle
+      if (opcion.empty()) break; // El cliente se ha desconectado, sale del bucle
 
-    else if (opcion == "1") Servidor -> Traductor();
-    else if (opcion == "2") Servidor -> InsertarNuevaTraduccion(); // funcion nueva trad
-    else if (opcion == "3") Servidor -> Enviar("Funcion todavia no implementada"); // funcion usuarios
-    else if (opcion == "4") Servidor -> Enviar("Funcion todavia no implementada"); // funcion registro act
-    else if (opcion == "5") Servidor -> Enviar("Funcion todavia no implementada"); // funcion cerrar sesion
-    else if (opcion == "0") Servidor -> Enviar("Funcion todavia no implementada"); // funcion salir
-    else Servidor -> Enviar("Inserte una opcion (Disponible 1 y 2)");
+      else if (opcion == "1") Servidor -> Traductor();
+      else if (opcion == "2") Servidor -> InsertarNuevaTraduccion(); // funcion nueva trad
+      else if (opcion == "3") Servidor -> Enviar("Funcion todavia no implementada"); // funcion usuarios
+      else if (opcion == "4") Servidor -> Enviar("Funcion todavia no implementada"); // funcion registro act
+      else if (opcion == "5") Servidor -> Enviar("Funcion todavia no implementada"); // funcion cerrar sesion
+      else if (opcion == "0") Servidor -> Enviar("Funcion todavia no implementada"); // funcion salir
+      else Servidor -> Enviar("Inserte una opcion (Disponible 1 y 2)");
+    }
   }
   delete Servidor;
   return 0;
