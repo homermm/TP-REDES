@@ -175,7 +175,7 @@ public:
   }
 
   //!FUNCION USUARIOS
-  void AceptarCliente() {
+  bool AceptarCliente() {
         Enviar("Bienvenido al servidor. Por favor, ingrese su nombre de usuario:");
         string usuario = Recibir();
         Enviar("Ingrese su contraseña:");
@@ -184,9 +184,11 @@ public:
         // Verifica si el usuario/contraseña es valido
         if (ValidarCredenciales(usuario, contrasena)) {
             Enviar("Autenticación exitosa. ¡Bienvenido!");
+            return true;
         } else {
             Enviar("Datos de usuario incorrectos. La conexión se cerrará.");
             CerrarSocket();
+            return false;
         }
     }
 
@@ -221,20 +223,23 @@ public:
 int main() {
     Server* Servidor = new Server();
     while (true) {
-        Servidor->AceptarCliente();
-        while (true) {
-            string opcion = Servidor->Recibir();
+        //Servidor->AceptarCliente();
+        if(Servidor->AceptarCliente()){
+            while (true) {
+                string opcion = Servidor->Recibir();
 
-            if (opcion.empty()) break; // El cliente se ha desconectado, sale del bucle
+                if (opcion.empty()) break; // El cliente se ha desconectado, sale del bucle
 
-            else if (opcion == "1") Servidor->Traductor();
-            else if (opcion == "2") Servidor->InsertarNuevaTraduccion();
-            else if (opcion == "3") Servidor->Enviar("Función todavía no implementada");
-            else if (opcion == "4") Servidor->Enviar("Función todavía no implementada");
-            else if (opcion == "5") Servidor->Enviar("Función todavía no implementada");
-            else if (opcion == "0") Servidor->Enviar("Función todavía no implementada");
-            else Servidor->Enviar("Inserte una opción (Disponible 1 y 2)");
+                else if (opcion == "1") Servidor->Traductor();
+                else if (opcion == "2") Servidor->InsertarNuevaTraduccion();
+                else if (opcion == "3") Servidor->Enviar("Función todavía no implementada");
+                else if (opcion == "4") Servidor->Enviar("Función todavía no implementada");
+                else if (opcion == "5") Servidor->Enviar("Función todavía no implementada");
+                else if (opcion == "0") Servidor->Enviar("Función todavía no implementada");
+                else Servidor->Enviar("Inserte una opción (Disponible 1 y 2)");
+            }
         }
+
     }
     delete Servidor;
     return 0;
