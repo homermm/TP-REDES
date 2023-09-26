@@ -3,6 +3,8 @@
 #include <winsock2.h>
 #include <fstream>
 #include <algorithm>  // Para transformar a min�sculas
+#include <fstream>
+#include <sstream>
 
 using namespace std;
 
@@ -181,8 +183,29 @@ class Server {
   }
 
   bool ValidarCredenciales(string usuario, string contrasena) {
-    //funcion no desarrollada
-    return true;
+    ifstream archivo("credenciales.txt");
+    if (archivo.is_open()) {
+        string linea;
+        while (getline(archivo, linea)) {
+            istringstream iss(linea);
+            string usuarioArchivo, contrasenaArchivo, rol;
+            int intentos;
+
+            if (getline(iss, usuarioArchivo, '|') &&
+                getline(iss, contrasenaArchivo, '|') &&
+                getline(iss, rol, '|') &&
+                (iss >> intentos)) {
+                if (usuarioArchivo == usuario && contrasenaArchivo == contrasena) {
+                    // Las credenciales son válidas
+                    archivo.close();
+                    return true;
+                }
+            }
+        }
+        archivo.close();
+    }
+
+    return false; // Las credenciales no son válidas o no se encontraron en el archivo
   }
 
 };
