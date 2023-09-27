@@ -286,8 +286,8 @@ public:
     string nuevoUsuario = Recibir();
 
     // Verificar si el usuario ingresó datos válidos
-    if (nuevoUsuario.empty()) {
-        Enviar("Error al dar de alta el nuevo usuario: datos incompletos");
+    if (nuevoUsuario.empty() || nuevoUsuario.find(':') == std::string::npos) {
+        Enviar("Error al dar de alta el nuevo usuario: datos incompletos o formato incorrecto");
         return;
     }
 
@@ -303,6 +303,12 @@ public:
 
     string nombreUsuario = nuevoUsuario.substr(0, separadorPos);
     string contrasena = nuevoUsuario.substr(separadorPos + 1);
+
+    // Verificar si el nombre de usuario y la contraseña no son vacíos
+    if (nombreUsuario.empty() || contrasena.empty()) {
+        Enviar("Error al dar de alta el nuevo usuario: nombre de usuario o contraseña vacíos");
+        return;
+    }
 
     // Convertir el nombre de usuario a minúsculas
     nombreUsuario = ConvertirAMinusculas(nombreUsuario);
@@ -326,8 +332,6 @@ public:
 
     Enviar(nombreUsuario + " dado de alta correctamente");
 }
-
-
 
 bool UsuarioExiste(const string & nombreUsuario) {
     ifstream archivoCredenciales("credenciales.txt");
