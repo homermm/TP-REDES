@@ -5,6 +5,7 @@
 #include <algorithm>  // Para transformar a minúsculas
 #include <fstream>
 #include <sstream>
+#include <vector>
 
 using namespace std;
 
@@ -356,9 +357,92 @@ bool UsuarioExiste(const string & nombreUsuario) {
 }
 
     void ListarUsuariosBloqueados() {
-        // Enviar la lista de usuarios bloqueados o un mensaje si no hay usuarios bloqueados
-        Enviar("Lista de usuarios bloqueados o mensaje si no hay usuarios bloqueados.");
+    ifstream archivo("credenciales.txt");
+    ofstream archivoTemp("credenciales_temp.txt");
+    vector<string> usuariosBloqueados; // Vector para almacenar usuarios bloqueados
+
+    if (archivo.is_open() && archivoTemp.is_open()) {
+        string linea;
+        while (getline(archivo, linea)) {
+            istringstream iss(linea);
+            string usuarioArchivo, contrasenaArchivo, rol;
+            int intentos;
+
+            if (getline(iss, usuarioArchivo, '|') &&
+                getline(iss, contrasenaArchivo, '|') &&
+                getline(iss, rol, '|') &&
+                (iss >> intentos)) {
+                if (intentos >= 3) {
+                    usuariosBloqueados.push_back(usuarioArchivo); // Agregar usuario bloqueado al vector
+                } else {
+                    archivoTemp << linea << endl; // Conservar usuarios no bloqueados en el archivo temporal
+                }
+            }
+        }
+        archivo.close();
+        archivoTemp.close();
+
+        if (!usuariosBloqueados.empty()) {
+            // Crear una cadena para almacenar los mensajes
+            string mensaje = "\nUsuarios bloqueados:\n";
+            for (size_t i = 0; i < usuariosBloqueados.size(); ++i) {
+                mensaje += to_string(i + 1) + ". " + usuariosBloqueados[i] + "\n";
+            }
+
+            mensaje += "Elija el número de usuario que desea desbloquear (1-" + to_string(usuariosBloqueados.size()) + "):";
+
+            // Enviar el mensaje completo
+            Enviar(mensaje);
+
+            string eleccion = Recibir();
+            // Verificar si la elección es válida
+            int opcion = stoi(eleccion);
+            if (opcion >= 1 && opcion <= usuariosBloqueados.size()) {
+                // Restablecer intentos a 0
+                string usuarioDesbloquear = usuariosBloqueados[opcion - 1];
+                RestablecerIntentos(usuarioDesbloquear);
+                Enviar(usuarioDesbloquear + " desbloqueado correctamente");
+            } else {
+                Enviar("Elección no válida.");
+            }
+        } else {
+            Enviar("No se encontraron usuarios bloqueados.");
+        }
+
+        remove("credenciales.txt");
+        rename("credenciales_temp.txt", "credenciales.txt"); // Actualizar el archivo de credenciales
     }
+}
+
+void RestablecerIntentos(const string & usuario) {
+    ifstream archivo("credenciales.txt");
+    ofstream archivoTemp("credenciales_temp.txt");
+
+    if (archivo.is_open() && archivoTemp.is_open()) {
+        string linea;
+        while (getline(archivo, linea)) {
+            istringstream iss(linea);
+            string usuarioArchivo, contrasenaArchivo, rol;
+            int intentos;
+
+            if (getline(iss, usuarioArchivo, '|') &&
+                getline(iss, contrasenaArchivo, '|') &&
+                getline(iss, rol, '|') &&
+                (iss >> intentos)) {
+                if (usuarioArchivo == usuario) {
+                    // Restablecer el contador de intentos a 0
+                    intentos = 0;
+                }
+                archivoTemp << usuarioArchivo << "|" << contrasenaArchivo << "|" << rol << "|" << intentos << endl;
+            } else {
+                archivoTemp << linea << endl;
+            }
+        }
+        archivo.close();
+        archivoTemp.close();
+    }
+}
+
 
 };
 
