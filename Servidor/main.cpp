@@ -183,40 +183,85 @@ public:
 
         // Verifica si el usuario/contraseña es valido
         if (ValidarCredenciales(usuario, contrasena)) {
-            Enviar("Autenticación exitosa. ¡Bienvenido!");
+            //Enviar("Autenticación exitosa. ¡Bienvenido!");
             return true;
         } else {
-            Enviar("Datos de usuario incorrectos. La conexión se cerrará.");
+
+            //!NEW
+            BloquearUsuario(usuario);
             CerrarSocket();
             return false;
         }
     }
 
   bool ValidarCredenciales(string usuario, string contrasena) {
-    ifstream archivo("credenciales.txt");
-    if (archivo.is_open()) {
-        string linea;
-        while (getline(archivo, linea)) {
-            istringstream iss(linea);
-            string usuarioArchivo, contrasenaArchivo, rol;
-            int intentos;
+        ifstream archivo("credenciales.txt");
+        if (archivo.is_open()) {
+            string linea;
+            while (getline(archivo, linea)) {
+                istringstream iss(linea);
+                string usuarioArchivo, contrasenaArchivo, rol;
+                int intentos;
 
-            if (getline(iss, usuarioArchivo, '|') &&
-                getline(iss, contrasenaArchivo, '|') &&
-                getline(iss, rol, '|') &&
-                (iss >> intentos)) {
-                if (usuarioArchivo == usuario && contrasenaArchivo == contrasena) {
-                    // Las credenciales son válidas
-                    archivo.close();
-                    return true;
+                if (getline(iss, usuarioArchivo, '|') &&
+                    getline(iss, contrasenaArchivo, '|') &&
+                    getline(iss, rol, '|') &&
+                    (iss >> intentos)) {
+                    if (usuarioArchivo == usuario) {
+                        // Verificar si el usuario está bloqueado
+                        if (intentos >= 3) {
+                            archivo.close();
+                            return false;
+                        }
+
+                        if (contrasenaArchivo == contrasena) {
+                            // Las credenciales son válidas
+                            archivo.close();
+                            Enviar("Autenticación exitosa. ¡Bienvenido!");
+                            return true;
+                        }
+                    }
                 }
             }
+            archivo.close();
         }
-        archivo.close();
-    }
 
-    return false; // Las credenciales no son válidas o no se encontraron en el archivo
-  }
+        return false; // Las credenciales no son válidas o no se encontraron en el archivo
+    }
+    void BloquearUsuario(string usuario) {
+        ifstream archivo("credenciales.txt");
+        ofstream archivoTemp("credenciales_temp.txt");
+        if (archivo.is_open() && archivoTemp.is_open()) {
+            string linea;
+            while (getline(archivo, linea)) {
+                istringstream iss(linea);
+                string usuarioArchivo, contrasenaArchivo, rol;
+                int intentos;
+
+                if (getline(iss, usuarioArchivo, '|') &&
+                    getline(iss, contrasenaArchivo, '|') &&
+                    getline(iss, rol, '|') &&
+                    (iss >> intentos)) {
+                    if (usuarioArchivo == usuario) {
+                        // Incrementar el contador de intentos fallidos
+                        intentos++;
+                        if (intentos >= 3) {
+                            Enviar("Se ha superado la cantidad maxima de intentos, la cuenta " + usuario + " ha sido bloqueada.");
+                        } else {
+                            Enviar("Datos de usuario incorrectos. La conexión se cerrará.");
+                        }
+                    }
+                    archivoTemp << usuarioArchivo << "|" << contrasenaArchivo << "|" << rol << "|" << intentos << endl;
+                } else {
+                    archivoTemp << linea << endl;
+                }
+            }
+            archivo.close();
+            archivoTemp.close();
+            remove("credenciales.txt");
+            rename("credenciales_temp.txt", "credenciales.txt");
+        }
+    }
 
 };
 
