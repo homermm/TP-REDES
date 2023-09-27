@@ -183,12 +183,9 @@ public:
 
         // Verifica si el usuario/contraseña es valido
         if (ValidarCredenciales(usuario, contrasena)) {
-            //Enviar("Autenticación exitosa. ¡Bienvenido!");
-            return true;
+            return true; // Usuario aceptado, retorno true
         } else {
-
-            //!NEW
-            BloquearUsuario(usuario);
+            BloquearUsuario(usuario); // Sumo intentos y si tiene 3 o mas lo baneo
             CerrarSocket();
             return false;
         }
@@ -263,6 +260,40 @@ public:
         }
     }
 
+    //!
+      void SubmenuUsuarios() {
+        Enviar("\nSubmenu Usuarios\n1. Alta\n2. Desbloqueo\nEscriba /salir para volver al menu principal");
+        while (true) {
+            string opcion = Recibir();
+
+            if (opcion.empty()) break; // El cliente se ha desconectado, sale del bucle
+
+            if (opcion == "1") {
+                DarAltaUsuario();
+            } else if (opcion == "2") {
+                ListarUsuariosBloqueados();
+            } else if (opcion == "/salir") {
+                Enviar("Has vuelto al menu principal.");
+                break;
+            } else {
+                Enviar("Inserte una opción válida (1, 2 o /salir)");
+            }
+        }
+    }
+
+    void DarAltaUsuario() {
+        Enviar("Ingrese nuevo usuario (Nombre:Contraseña):");
+        string nuevoUsuario = Recibir();
+
+        // Enviar respuesta al cliente
+        Enviar("Nuevo usuario agregado correctamente o mensaje de error si no se pudo agregar.");
+    }
+
+    void ListarUsuariosBloqueados() {
+        // Enviar la lista de usuarios bloqueados o un mensaje si no hay usuarios bloqueados
+        Enviar("Lista de usuarios bloqueados o mensaje si no hay usuarios bloqueados.");
+    }
+
 };
 
 int main() {
@@ -276,7 +307,7 @@ int main() {
 
                 else if (opcion == "1") Servidor->Traductor();
                 else if (opcion == "2") Servidor->InsertarNuevaTraduccion();
-                else if (opcion == "3") Servidor->Enviar("Función todavía no implementada");
+                else if (opcion == "3") Servidor->SubmenuUsuarios();
                 else if (opcion == "4") Servidor->Enviar("Función todavía no implementada");
                 else if (opcion == "5") break;
                 else Servidor->Enviar("Inserte una opción (Disponible 1 y 2)");

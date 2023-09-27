@@ -1,1 +1,1 @@
-test|test|ADMIN|4
+test|test|ADMIN|0
