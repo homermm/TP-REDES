@@ -1,1 +1,2 @@
 test|test|ADMIN|0
+homer|homer|CONSULTA|0

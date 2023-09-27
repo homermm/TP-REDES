@@ -282,12 +282,74 @@ public:
     }
 
     void DarAltaUsuario() {
-        Enviar("Ingrese nuevo usuario (Nombre:Contraseña):");
-        string nuevoUsuario = Recibir();
+    Enviar("Ingrese nuevo usuario (Nombre:Contraseña):");
+    string nuevoUsuario = Recibir();
 
-        // Enviar respuesta al cliente
-        Enviar("Nuevo usuario agregado correctamente o mensaje de error si no se pudo agregar.");
+    // Verificar si el usuario ingresó datos válidos
+    if (nuevoUsuario.empty()) {
+        Enviar("Error al dar de alta el nuevo usuario: datos incompletos");
+        return;
     }
+
+    // Reemplazar los ":" con "|" en la cadena de entrada
+    replace(nuevoUsuario.begin(), nuevoUsuario.end(), ':', '|');
+
+    // Separar el nombre de usuario y la contraseña
+    size_t separadorPos = nuevoUsuario.find('|');
+    if (separadorPos == std::string::npos) {
+        Enviar("Error al dar de alta el nuevo usuario: formato incorrecto (Nombre:Contraseña)");
+        return;
+    }
+
+    string nombreUsuario = nuevoUsuario.substr(0, separadorPos);
+    string contrasena = nuevoUsuario.substr(separadorPos + 1);
+
+    // Convertir el nombre de usuario a minúsculas
+    nombreUsuario = ConvertirAMinusculas(nombreUsuario);
+
+    // Verificar si el usuario ya existe
+    if (UsuarioExiste(nombreUsuario)) {
+        Enviar("Error al dar de alta el nuevo usuario: usuario existente");
+        return;
+    }
+
+    // Agregar el nuevo usuario al archivo de credenciales
+    ofstream archivoCredenciales("credenciales.txt", std::ios::app);
+    if (!archivoCredenciales.is_open()) {
+        Enviar("Error al abrir el archivo de credenciales para agregar el nuevo usuario");
+        return;
+    }
+
+    // Establecer el campo intentos a 0 y el rol a CONSULTA
+    archivoCredenciales << nombreUsuario << "|" << contrasena << "|CONSULTA|0" << endl;
+    archivoCredenciales.close();
+
+    Enviar(nombreUsuario + " dado de alta correctamente");
+}
+
+
+
+bool UsuarioExiste(const string & nombreUsuario) {
+    ifstream archivoCredenciales("credenciales.txt");
+    if (archivoCredenciales.is_open()) {
+        string linea;
+        while (getline(archivoCredenciales, linea)) {
+            istringstream iss(linea);
+            string usuarioArchivo;
+
+            if (getline(iss, usuarioArchivo, '|')) {
+                // Convertir el nombre de usuario almacenado a minúsculas y comparar
+                usuarioArchivo = ConvertirAMinusculas(usuarioArchivo);
+                if (usuarioArchivo == nombreUsuario) {
+                    archivoCredenciales.close();
+                    return true; // El usuario ya existe
+                }
+            }
+        }
+        archivoCredenciales.close();
+    }
+    return false; // El usuario no existe
+}
 
     void ListarUsuariosBloqueados() {
         // Enviar la lista de usuarios bloqueados o un mensaje si no hay usuarios bloqueados
