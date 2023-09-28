@@ -1,11 +1,11 @@
 #include <iostream>
 #include <cstring>
 #include <winsock2.h>
-#include <fstream>
-#include <algorithm>  // Para transformar a minúsculas
-#include <fstream>
+#include <fstream>  // Agregado para trabajar con archivos
+#include <algorithm> // Agregado para transformar a minúsculas
 #include <sstream>
 #include <vector>
+#include <ctime>     // Agregado para obtener la fecha y hora actual
 
 using namespace std;
 
@@ -30,6 +30,7 @@ class Server {
     listen(server, 0);
 
     cout << "Escuchando para conexiones entrantes en el puerto 5555." << endl;
+    RegistrarEvento("=======Inicia Servidor=======");
 
     // Aceptar la conexión del cliente antes de entrar en el bucle principal
     int clientAddrSize = sizeof(clientAddr);
@@ -59,6 +60,7 @@ class Server {
 
   void CerrarSocket() {
     closesocket(client);
+    RegistrarEvento("Cierre de sesion."); // Registrar cierre de sesión
     cout << "Socket cerrado, cliente desconectado." << endl;
     // Aceptar una nueva conexión antes de salir de esta función
     int clientAddrSize = sizeof(clientAddr);
@@ -183,6 +185,7 @@ class Server {
 
     // Verifica si el usuario/contraseña es valido
     if (ValidarCredenciales(usuario, contrasena)) {
+      RegistrarEvento("Inicio de sesion – usuario: " + usuario); // Registrar inicio de sesión
       return true; // Usuario aceptado, retorno true
     } else {
       BloquearUsuario(usuario); // Sumo intentos y si tiene 3 o mas lo baneo
@@ -449,13 +452,13 @@ class Server {
     while (true) {
       if (rolUsuario == "ADMIN") {
         // Menú para el rol de administrador
-        Enviar("\nMenu Principal (Rol: ADMIN):\n1. Traductor\n2. Insertar Nueva Traduccion\n3. Submenu Usuarios\n4. Opcion 4\n5. Salir");
+        Enviar("\nMenu Principal (Rol: ADMIN):\n1. Traductor\n2. Insertar Nueva Traduccion\n3. Submenu Usuarios\n4. Ver registro de actividades\n5. Salir");
         string opcion = Recibir();
         if (opcion.empty()) break; // El cliente se ha desconectado, sale del bucle
         if (opcion == "1") Traductor();
         if (opcion == "2") InsertarNuevaTraduccion();
         if (opcion == "3") SubmenuUsuarios();
-        if (opcion == "4") Enviar("Función todavía no implementada");
+        if (opcion == "4") EnviarRegistroActividades();
         if (opcion == "5") break;
         else Enviar("Inserte una opción válida (1-5)");
       }
@@ -473,6 +476,43 @@ class Server {
     }
 
   }
+  //! EVENTOS
+  void RegistrarEvento(const string &evento) {
+    ofstream logFile("server.log", ios::app);
+    if (logFile.is_open()) {
+        time_t now = time(0);
+        struct tm tstruct;
+        char buf[80];
+        tstruct = *localtime(&now);
+        strftime(buf, sizeof(buf), "%Y-%m-%d_%H:%M:%S", &tstruct);
+
+        logFile << buf << ": " << evento << endl;
+        logFile.close();
+    } else {
+        cout << "Error al abrir el archivo de registro." << endl;
+    }
+}
+// Modifica la función EnviarRegistroActividades en la clase Server
+void EnviarRegistroActividades() {
+    ifstream logFile("server.log");
+    if (!logFile.is_open()) {
+        Enviar("Error: No se pudo abrir el archivo de registro de actividades.");
+        return;
+    }
+
+    stringstream logContent;
+    string linea;
+    while (getline(logFile, linea)) {
+        logContent << linea << endl; // Lee y concatena cada línea del archivo
+    }
+
+    logFile.close();
+
+    string contenidoCompleto = logContent.str();
+    Enviar(contenidoCompleto); // Envía todo el contenido del archivo como un solo mensaje
+}
+
+
 };
 
 int main() {

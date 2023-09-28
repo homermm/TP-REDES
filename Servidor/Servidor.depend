@@ -1,11 +1,11 @@
 # depslib dependency file v1.0
-1695904535 source:c:\users\homer\desktop\redes\servidor\main.cpp
+1695911871 source:c:\users\homer\desktop\redes\servidor\main.cpp
 	<iostream>
 	<cstring>
 	<winsock2.h>
 	<fstream>
 	<algorithm>
-	<fstream>
 	<sstream>
 	<vector>
+	<ctime>
 

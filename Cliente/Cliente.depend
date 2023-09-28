@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1695905287 source:c:\users\homer\desktop\redes\cliente\main.cpp
+1695910106 source:c:\users\homer\desktop\redes\cliente\main.cpp
 	<iostream>
 	<cstring>
 	<winsock2.h>
