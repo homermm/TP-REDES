@@ -96,16 +96,16 @@ int main() {
 
   Client * Cliente = new Client(serverIP.c_str(), serverPort, usuario.c_str(), contrasena.c_str());
 
-  Cliente -> Recibir(); //mensaje de autenticacion correcta
-  system("cls"); //limpio el inicio de sesion
+  Cliente -> Recibir(); // mensaje de autenticacion correcta
+  system("cls"); // limpio el inicio de sesion
   Cliente -> Recibir(); // recibo menu
 
   while (true) {
     string opcion;
     getline(cin, opcion);
-
     Cliente -> Enviar(opcion);
-    if (opcion == "/salir") system("cls"); //borro la consola para luego recibir el menu desde el servidor
+
+    if (opcion == "/salir") system("cls"); // borro la consola para luego recibir el menu desde el servidor
 
     Cliente -> Recibir();
   }

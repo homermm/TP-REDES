@@ -10,6 +10,8 @@
 using namespace std;
 
 class Server {
+private:
+    string rolUsuario; // Declaración del rol del usuario
 public:
     WSADATA WSAData;
     SOCKET server;
@@ -193,39 +195,41 @@ public:
     }
 
   bool ValidarCredenciales(string usuario, string contrasena) {
-        ifstream archivo("credenciales.txt");
-        if (archivo.is_open()) {
-            string linea;
-            while (getline(archivo, linea)) {
-                istringstream iss(linea);
-                string usuarioArchivo, contrasenaArchivo, rol;
-                int intentos;
+    ifstream archivo("credenciales.txt");
+    if (archivo.is_open()) {
+        string linea;
+        while (getline(archivo, linea)) {
+            istringstream iss(linea);
+            string usuarioArchivo, contrasenaArchivo, rol;
+            int intentos;
 
-                if (getline(iss, usuarioArchivo, '|') &&
-                    getline(iss, contrasenaArchivo, '|') &&
-                    getline(iss, rol, '|') &&
-                    (iss >> intentos)) {
-                    if (usuarioArchivo == usuario) {
-                        // Verificar si el usuario está bloqueado
-                        if (intentos >= 3) {
-                            archivo.close();
-                            return false;
-                        }
+            if (getline(iss, usuarioArchivo, '|') &&
+                getline(iss, contrasenaArchivo, '|') &&
+                getline(iss, rol, '|') &&
+                (iss >> intentos)) {
+                if (usuarioArchivo == usuario) {
+                    // Verificar si el usuario está bloqueado
+                    if (intentos >= 3) {
+                        archivo.close();
+                        return false;
+                    }
 
-                        if (contrasenaArchivo == contrasena) {
-                            // Las credenciales son válidas
-                            archivo.close();
-                            Enviar("Autenticación exitosa. ¡Bienvenido!");
-                            return true;
-                        }
+                    if (contrasenaArchivo == contrasena) {
+                        // Las credenciales son válidas
+                        archivo.close();
+                        Enviar("Autenticación exitosa. ¡Bienvenido!");
+                        rolUsuario = rol; // Almacenar el rol del usuario actual
+                        return true;
                     }
                 }
             }
-            archivo.close();
         }
-
-        return false; // Las credenciales no son válidas o no se encontraron en el archivo
+        archivo.close();
     }
+
+    return false; // Las credenciales no son válidas o no se encontraron en el archivo
+}
+
     void BloquearUsuario(string usuario) {
         ifstream archivo("credenciales.txt");
         ofstream archivoTemp("credenciales_temp.txt");
@@ -443,54 +447,35 @@ void RestablecerIntentos(const string & usuario) {
     }
 }
 
- void MenuPrincipal() {
-        while (true) {
-            Enviar("\nMenú Principal:\n1. Traductor\n2. Insertar Nueva Traducción\n3. Submenú Usuarios\n4. Opción 4\n5. Salir");
-            string opcion = Recibir();
-
-            if (opcion.empty()) break; // El cliente se ha desconectado, sale del bucle
-
-            if (opcion == "1") {
-                Traductor();
-            } else if (opcion == "2") {
-                InsertarNuevaTraduccion();
-            } else if (opcion == "3") {
-                SubmenuUsuarios();
-            } else if (opcion == "4") {
-                Enviar("Función todavía no implementada");
-            } else if (opcion == "5") {
-                Enviar("Desconexión del cliente.");
-                break;
-            } else {
-                Enviar("Inserte una opción válida (1-5)");
-            }
-        }
-    }
-
-};
-
-/*int main() {
-    Server* Servidor = new Server();
+void MenuPrincipal() {
     while (true) {
-        if(Servidor->AceptarCliente()){
-            while (true) {
-                string opcion = Servidor->Recibir();
-
-                if (opcion.empty()) break; // El cliente se ha desconectado, sale del bucle
-
-                else if (opcion == "1") Servidor->Traductor();
-                else if (opcion == "2") Servidor->InsertarNuevaTraduccion();
-                else if (opcion == "3") Servidor->SubmenuUsuarios();
-                else if (opcion == "4") Servidor->Enviar("Función todavía no implementada");
-                else if (opcion == "5") break;
-                else Servidor->Enviar("Inserte una opción (Disponible 1 y 2)");
-            }
+        if (rolUsuario == "ADMIN") {
+            // Menú para el rol de administrador
+            Enviar("\nMenu Principal (Rol: ADMIN):\n1. Traductor\n2. Insertar Nueva Traduccion\n3. Submenú Usuarios\n4. Opcion 4\n5. Salir");
+            string opcion = Recibir();
+            if (opcion.empty()) break; // El cliente se ha desconectado, sale del bucle
+            if (opcion == "1") Traductor();
+            if (opcion == "2") InsertarNuevaTraduccion();
+            if (opcion == "3") SubmenuUsuarios();
+            if (opcion == "4") Enviar("Función todavía no implementada");
+            if (opcion == "5") break;
+            else Enviar("Inserte una opción válida (1-5)");
         }
 
-    }
-    delete Servidor;
-    return 0;
-}*/
+        if (rolUsuario == "CONSULTA") {
+            // Menú para el rol de consulta
+            Enviar("\nMenu Principal (Rol: CONSULTA):\n1. Traductor\n2. Salir");
+            string opcion = Recibir();
+            if (opcion.empty()) break; // El cliente se ha desconectado, sale del bucle
+            if (opcion == "1") Traductor();
+            if (opcion == "2") break;
+            else Enviar("Inserte una opcion valida (1-2)");
+        }
+
+}
+
+}
+};
 
 int main() {
     Server* Servidor = new Server();
