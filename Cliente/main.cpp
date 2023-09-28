@@ -1,7 +1,5 @@
 #include <iostream>
-
 #include <cstring>
-
 #include <winsock2.h>
 
 using namespace std;

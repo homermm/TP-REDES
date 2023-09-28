@@ -10,35 +10,33 @@
 using namespace std;
 
 class Server {
-private:
-    string rolUsuario; // Declaración del rol del usuario
-public:
-    WSADATA WSAData;
-    SOCKET server;
-    SOCKET client; // Cambiado a SOCKET en lugar de SOCKET client;
-    SOCKADDR_IN serverAddr;
-    SOCKADDR_IN clientAddr;
-    char buffer[1024];
+  private: string rolUsuario; // Declaración del rol del usuario
+  public: WSADATA WSAData;
+  SOCKET server;
+  SOCKET client; // Cambiado a SOCKET en lugar de SOCKET client;
+  SOCKADDR_IN serverAddr;
+  SOCKADDR_IN clientAddr;
+  char buffer[1024];
 
-    Server() {
-        WSAStartup(MAKEWORD(2, 0), &WSAData);
-        server = socket(AF_INET, SOCK_STREAM, 0);
+  Server() {
+    WSAStartup(MAKEWORD(2, 0), & WSAData);
+    server = socket(AF_INET, SOCK_STREAM, 0);
 
-        serverAddr.sin_addr.s_addr = INADDR_ANY;
-        serverAddr.sin_family = AF_INET;
-        serverAddr.sin_port = htons(5555);
+    serverAddr.sin_addr.s_addr = INADDR_ANY;
+    serverAddr.sin_family = AF_INET;
+    serverAddr.sin_port = htons(5555);
 
-        bind(server, (SOCKADDR*)&serverAddr, sizeof(serverAddr));
-        listen(server, 0);
+    bind(server, (SOCKADDR * ) & serverAddr, sizeof(serverAddr));
+    listen(server, 0);
 
-        cout << "Escuchando para conexiones entrantes en el puerto 5555." << endl;
+    cout << "Escuchando para conexiones entrantes en el puerto 5555." << endl;
 
-        // Aceptar la conexión del cliente antes de entrar en el bucle principal
-        int clientAddrSize = sizeof(clientAddr);
-        if ((client = accept(server, (SOCKADDR*)&clientAddr, &clientAddrSize)) != INVALID_SOCKET) {
-            cout << "Cliente conectado!" << endl;
-        }
+    // Aceptar la conexión del cliente antes de entrar en el bucle principal
+    int clientAddrSize = sizeof(clientAddr);
+    if ((client = accept(server, (SOCKADDR * ) & clientAddr, & clientAddrSize)) != INVALID_SOCKET) {
+      cout << "Cliente conectado!" << endl;
     }
+  }
 
   //!FUNCIONES PRIMITIVAS
   string Recibir() {
@@ -60,19 +58,19 @@ public:
   }
 
   void CerrarSocket() {
-        closesocket(client);
-        cout << "Socket cerrado, cliente desconectado." << endl;
-        // Aceptar una nueva conexión antes de salir de esta función
-        int clientAddrSize = sizeof(clientAddr);
-        if ((client = accept(server, (SOCKADDR*)&clientAddr, &clientAddrSize)) != INVALID_SOCKET) {
-            cout << "Cliente conectado!" << endl;
-        }
+    closesocket(client);
+    cout << "Socket cerrado, cliente desconectado." << endl;
+    // Aceptar una nueva conexión antes de salir de esta función
+    int clientAddrSize = sizeof(clientAddr);
+    if ((client = accept(server, (SOCKADDR * ) & clientAddr, & clientAddrSize)) != INVALID_SOCKET) {
+      cout << "Cliente conectado!" << endl;
     }
+  }
 
-    ~Server() {
-        closesocket(server);
-        WSACleanup();
-    }
+  ~Server() {
+    closesocket(server);
+    WSACleanup();
+  }
 
   //!FUNCIONES EXTRA
   //!TRADUCTOR
@@ -97,7 +95,6 @@ public:
       //Se buguea si envio 2 mensajes seguidos asi q lo dejo comentado =)
     }
   }
-  //!INSERTAR NUEVA TRADUCCION
   void InsertarNuevaTraduccion() {
     Enviar("Ingrese nueva traduccion (PalabraIngles:PalabraEspanol):");
     string nuevaTraduccion = Recibir();
@@ -179,121 +176,121 @@ public:
 
   //!FUNCION USUARIOS
   bool AceptarCliente() {
-        Enviar("Bienvenido al servidor. Por favor, ingrese su nombre de usuario:");
-        string usuario = Recibir();
-        Enviar("Ingrese su contraseña:");
-        string contrasena = Recibir();
+    Enviar("Bienvenido al servidor. Por favor, ingrese su nombre de usuario:");
+    string usuario = Recibir();
+    Enviar("Ingrese su contraseña:");
+    string contrasena = Recibir();
 
-        // Verifica si el usuario/contraseña es valido
-        if (ValidarCredenciales(usuario, contrasena)) {
-            return true; // Usuario aceptado, retorno true
-        } else {
-            BloquearUsuario(usuario); // Sumo intentos y si tiene 3 o mas lo baneo
-            CerrarSocket();
-            return false;
-        }
+    // Verifica si el usuario/contraseña es valido
+    if (ValidarCredenciales(usuario, contrasena)) {
+      return true; // Usuario aceptado, retorno true
+    } else {
+      BloquearUsuario(usuario); // Sumo intentos y si tiene 3 o mas lo baneo
+      CerrarSocket();
+      return false;
     }
+  }
 
   bool ValidarCredenciales(string usuario, string contrasena) {
     ifstream archivo("credenciales.txt");
     if (archivo.is_open()) {
-        string linea;
-        while (getline(archivo, linea)) {
-            istringstream iss(linea);
-            string usuarioArchivo, contrasenaArchivo, rol;
-            int intentos;
+      string linea;
+      while (getline(archivo, linea)) {
+        istringstream iss(linea);
+        string usuarioArchivo, contrasenaArchivo, rol;
+        int intentos;
 
-            if (getline(iss, usuarioArchivo, '|') &&
-                getline(iss, contrasenaArchivo, '|') &&
-                getline(iss, rol, '|') &&
-                (iss >> intentos)) {
-                if (usuarioArchivo == usuario) {
-                    // Verificar si el usuario está bloqueado
-                    if (intentos >= 3) {
-                        archivo.close();
-                        return false;
-                    }
-
-                    if (contrasenaArchivo == contrasena) {
-                        // Las credenciales son válidas
-                        archivo.close();
-                        Enviar("Autenticación exitosa. ¡Bienvenido!");
-                        rolUsuario = rol; // Almacenar el rol del usuario actual
-                        return true;
-                    }
-                }
+        if (getline(iss, usuarioArchivo, '|') &&
+          getline(iss, contrasenaArchivo, '|') &&
+          getline(iss, rol, '|') &&
+          (iss >> intentos)) {
+          if (usuarioArchivo == usuario) {
+            // Verificar si el usuario está bloqueado
+            if (intentos >= 3) {
+              archivo.close();
+              return false;
             }
+
+            if (contrasenaArchivo == contrasena) {
+              // Las credenciales son válidas
+              archivo.close();
+              Enviar("Autenticación exitosa. ¡Bienvenido!");
+              rolUsuario = rol; // Almacenar el rol del usuario actual
+              return true;
+            }
+          }
         }
-        archivo.close();
+      }
+      archivo.close();
     }
 
     return false; // Las credenciales no son válidas o no se encontraron en el archivo
-}
+  }
 
-    void BloquearUsuario(string usuario) {
-        ifstream archivo("credenciales.txt");
-        ofstream archivoTemp("credenciales_temp.txt");
-        if (archivo.is_open() && archivoTemp.is_open()) {
-            string linea;
-            while (getline(archivo, linea)) {
-                istringstream iss(linea);
-                string usuarioArchivo, contrasenaArchivo, rol;
-                int intentos;
+  void BloquearUsuario(string usuario) {
+    ifstream archivo("credenciales.txt");
+    ofstream archivoTemp("credenciales_temp.txt");
+    if (archivo.is_open() && archivoTemp.is_open()) {
+      string linea;
+      while (getline(archivo, linea)) {
+        istringstream iss(linea);
+        string usuarioArchivo, contrasenaArchivo, rol;
+        int intentos;
 
-                if (getline(iss, usuarioArchivo, '|') &&
-                    getline(iss, contrasenaArchivo, '|') &&
-                    getline(iss, rol, '|') &&
-                    (iss >> intentos)) {
-                    if (usuarioArchivo == usuario) {
-                        // Incrementar el contador de intentos fallidos
-                        intentos++;
-                        if (intentos >= 3) {
-                            Enviar("Se ha superado la cantidad maxima de intentos, la cuenta " + usuario + " ha sido bloqueada.");
-                        } else {
-                            Enviar("Datos de usuario incorrectos. La conexión se cerrará.");
-                        }
-                    }
-                    archivoTemp << usuarioArchivo << "|" << contrasenaArchivo << "|" << rol << "|" << intentos << endl;
-                } else {
-                    archivoTemp << linea << endl;
-                }
-            }
-            archivo.close();
-            archivoTemp.close();
-            remove("credenciales.txt");
-            rename("credenciales_temp.txt", "credenciales.txt");
-        }
-    }
-
-    //!
-      void SubmenuUsuarios() {
-        Enviar("\nSubmenu Usuarios\n1. Alta\n2. Desbloqueo\nEscriba /salir para volver al menu principal");
-        while (true) {
-            string opcion = Recibir();
-
-            if (opcion.empty()) break; // El cliente se ha desconectado, sale del bucle
-
-            if (opcion == "1") {
-                DarAltaUsuario();
-            } else if (opcion == "2") {
-                ListarUsuariosBloqueados();
-            } else if (opcion == "/salir") {
-                Enviar("Has vuelto al menu principal.");
-                break;
+        if (getline(iss, usuarioArchivo, '|') &&
+          getline(iss, contrasenaArchivo, '|') &&
+          getline(iss, rol, '|') &&
+          (iss >> intentos)) {
+          if (usuarioArchivo == usuario) {
+            // Incrementar el contador de intentos fallidos
+            intentos++;
+            if (intentos >= 3) {
+              Enviar("Se ha superado la cantidad maxima de intentos, la cuenta " + usuario + " ha sido bloqueada.");
             } else {
-                Enviar("Inserte una opción válida (1, 2 o /salir)");
+              Enviar("Datos de usuario incorrectos. La conexión se cerrará.");
             }
+          }
+          archivoTemp << usuarioArchivo << "|" << contrasenaArchivo << "|" << rol << "|" << intentos << endl;
+        } else {
+          archivoTemp << linea << endl;
         }
+      }
+      archivo.close();
+      archivoTemp.close();
+      remove("credenciales.txt");
+      rename("credenciales_temp.txt", "credenciales.txt");
     }
+  }
 
-    void DarAltaUsuario() {
+  //!ADMIN USUARIOS
+  void SubmenuUsuarios() {
+    Enviar("\nSubmenu Usuarios\n1. Alta\n2. Desbloqueo\nEscriba /salir para volver al menu principal");
+    while (true) {
+      string opcion = Recibir();
+
+      if (opcion.empty()) break; // El cliente se ha desconectado, sale del bucle
+
+      if (opcion == "1") {
+        DarAltaUsuario();
+      } else if (opcion == "2") {
+        ListarUsuariosBloqueados();
+      } else if (opcion == "/salir") {
+        Enviar("Has vuelto al menu principal.");
+        break;
+      } else {
+        Enviar("Inserte una opción válida (1, 2 o /salir)");
+      }
+    }
+  }
+
+  void DarAltaUsuario() {
     Enviar("Ingrese nuevo usuario (Nombre:Contraseña):");
     string nuevoUsuario = Recibir();
 
     // Verificar si el usuario ingresó datos válidos
     if (nuevoUsuario.empty() || nuevoUsuario.find(':') == std::string::npos) {
-        Enviar("Error al dar de alta el nuevo usuario: datos incompletos o formato incorrecto");
-        return;
+      Enviar("Error al dar de alta el nuevo usuario: datos incompletos o formato incorrecto");
+      return;
     }
 
     // Reemplazar los ":" con "|" en la cadena de entrada
@@ -302,8 +299,8 @@ public:
     // Separar el nombre de usuario y la contraseña
     size_t separadorPos = nuevoUsuario.find('|');
     if (separadorPos == std::string::npos) {
-        Enviar("Error al dar de alta el nuevo usuario: formato incorrecto (Nombre:Contraseña)");
-        return;
+      Enviar("Error al dar de alta el nuevo usuario: formato incorrecto (Nombre:Contraseña)");
+      return;
     }
 
     string nombreUsuario = nuevoUsuario.substr(0, separadorPos);
@@ -311,8 +308,8 @@ public:
 
     // Verificar si el nombre de usuario y la contraseña no son vacíos
     if (nombreUsuario.empty() || contrasena.empty()) {
-        Enviar("Error al dar de alta el nuevo usuario: nombre de usuario o contraseña vacíos");
-        return;
+      Enviar("Error al dar de alta el nuevo usuario: nombre de usuario o contraseña vacíos");
+      return;
     }
 
     // Convertir el nombre de usuario a minúsculas
@@ -320,15 +317,15 @@ public:
 
     // Verificar si el usuario ya existe
     if (UsuarioExiste(nombreUsuario)) {
-        Enviar("Error al dar de alta el nuevo usuario: usuario existente");
-        return;
+      Enviar("Error al dar de alta el nuevo usuario: usuario existente");
+      return;
     }
 
     // Agregar el nuevo usuario al archivo de credenciales
     ofstream archivoCredenciales("credenciales.txt", std::ios::app);
     if (!archivoCredenciales.is_open()) {
-        Enviar("Error al abrir el archivo de credenciales para agregar el nuevo usuario");
-        return;
+      Enviar("Error al abrir el archivo de credenciales para agregar el nuevo usuario");
+      return;
     }
 
     // Establecer el campo intentos a 0 y el rol a CONSULTA
@@ -336,154 +333,155 @@ public:
     archivoCredenciales.close();
 
     Enviar(nombreUsuario + " dado de alta correctamente");
-}
+  }
 
-bool UsuarioExiste(const string & nombreUsuario) {
+  bool UsuarioExiste(const string & nombreUsuario) {
     ifstream archivoCredenciales("credenciales.txt");
     if (archivoCredenciales.is_open()) {
-        string linea;
-        while (getline(archivoCredenciales, linea)) {
-            istringstream iss(linea);
-            string usuarioArchivo;
+      string linea;
+      while (getline(archivoCredenciales, linea)) {
+        istringstream iss(linea);
+        string usuarioArchivo;
 
-            if (getline(iss, usuarioArchivo, '|')) {
-                // Convertir el nombre de usuario almacenado a minúsculas y comparar
-                usuarioArchivo = ConvertirAMinusculas(usuarioArchivo);
-                if (usuarioArchivo == nombreUsuario) {
-                    archivoCredenciales.close();
-                    return true; // El usuario ya existe
-                }
-            }
+        if (getline(iss, usuarioArchivo, '|')) {
+          // Convertir el nombre de usuario almacenado a minúsculas y comparar
+          usuarioArchivo = ConvertirAMinusculas(usuarioArchivo);
+          if (usuarioArchivo == nombreUsuario) {
+            archivoCredenciales.close();
+            return true; // El usuario ya existe
+          }
         }
-        archivoCredenciales.close();
+      }
+      archivoCredenciales.close();
     }
     return false; // El usuario no existe
-}
+  }
 
-    void ListarUsuariosBloqueados() {
+  void ListarUsuariosBloqueados() {
     ifstream archivo("credenciales.txt");
     ofstream archivoTemp("credenciales_temp.txt");
-    vector<string> usuariosBloqueados; // Vector para almacenar usuarios bloqueados
+    vector < string > usuariosBloqueados; // Vector para almacenar usuarios bloqueados
 
     if (archivo.is_open() && archivoTemp.is_open()) {
-        string linea;
-        while (getline(archivo, linea)) {
-            istringstream iss(linea);
-            string usuarioArchivo, contrasenaArchivo, rol;
-            int intentos;
+      string linea;
+      while (getline(archivo, linea)) {
+        istringstream iss(linea);
+        string usuarioArchivo, contrasenaArchivo, rol;
+        int intentos;
 
-            if (getline(iss, usuarioArchivo, '|') &&
-                getline(iss, contrasenaArchivo, '|') &&
-                getline(iss, rol, '|') &&
-                (iss >> intentos)) {
-                if (intentos >= 3) {
-                    usuariosBloqueados.push_back(usuarioArchivo); // Agregar usuario bloqueado al vector
-                } else {
-                    archivoTemp << linea << endl; // Conservar usuarios no bloqueados en el archivo temporal
-                }
-            }
+        if (getline(iss, usuarioArchivo, '|') &&
+          getline(iss, contrasenaArchivo, '|') &&
+          getline(iss, rol, '|') &&
+          (iss >> intentos)) {
+          if (intentos >= 3) {
+            usuariosBloqueados.push_back(usuarioArchivo); // Agregar usuario bloqueado al vector
+          } else {
+            archivoTemp << linea << endl; // Conservar usuarios no bloqueados en el archivo temporal
+          }
         }
-        archivo.close();
-        archivoTemp.close();
+      }
+      archivo.close();
+      archivoTemp.close();
 
-        if (!usuariosBloqueados.empty()) {
-            // Crear una cadena para almacenar los mensajes
-            string mensaje = "\nUsuarios bloqueados:\n";
-            for (size_t i = 0; i < usuariosBloqueados.size(); ++i) {
-                mensaje += to_string(i + 1) + ". " + usuariosBloqueados[i] + "\n";
-            }
+      if (!usuariosBloqueados.empty()) {
+        // Crear una cadena para almacenar los mensajes
+        string mensaje = "\nUsuarios bloqueados:\n";
+        for (size_t i = 0; i < usuariosBloqueados.size(); ++i) {
+          mensaje += to_string(i + 1) + ". " + usuariosBloqueados[i] + "\n";
+        }
 
-            mensaje += "Elija el número de usuario que desea desbloquear (1-" + to_string(usuariosBloqueados.size()) + "):";
+        mensaje += "Elija el número de usuario que desea desbloquear (1-" + to_string(usuariosBloqueados.size()) + "):";
 
-            // Enviar el mensaje completo
-            Enviar(mensaje);
+        // Enviar el mensaje completo
+        Enviar(mensaje);
 
-            string eleccion = Recibir();
-            // Verificar si la elección es válida
-            int opcion = stoi(eleccion);
-            if (opcion >= 1 && opcion <= usuariosBloqueados.size()) {
-                // Restablecer intentos a 0
-                string usuarioDesbloquear = usuariosBloqueados[opcion - 1];
-                RestablecerIntentos(usuarioDesbloquear);
-                Enviar(usuarioDesbloquear + " desbloqueado correctamente");
-            } else {
-                Enviar("Elección no válida.");
-            }
+        string eleccion = Recibir();
+        // Verificar si la elección es válida
+        int opcion = stoi(eleccion);
+        if (opcion >= 1 && opcion <= usuariosBloqueados.size()) {
+          // Restablecer intentos a 0
+          string usuarioDesbloquear = usuariosBloqueados[opcion - 1];
+          RestablecerIntentos(usuarioDesbloquear);
+          Enviar(usuarioDesbloquear + " desbloqueado correctamente");
         } else {
-            Enviar("No se encontraron usuarios bloqueados.");
+          Enviar("Elección no válida.");
         }
+      } else {
+        Enviar("No se encontraron usuarios bloqueados.");
+      }
 
-        remove("credenciales.txt");
-        rename("credenciales_temp.txt", "credenciales.txt"); // Actualizar el archivo de credenciales
+      remove("credenciales.txt");
+      rename("credenciales_temp.txt", "credenciales.txt"); // Actualizar el archivo de credenciales
     }
-}
+  }
 
-void RestablecerIntentos(const string & usuario) {
+  void RestablecerIntentos(const string & usuario) {
     ifstream archivo("credenciales.txt");
     ofstream archivoTemp("credenciales_temp.txt");
 
     if (archivo.is_open() && archivoTemp.is_open()) {
-        string linea;
-        while (getline(archivo, linea)) {
-            istringstream iss(linea);
-            string usuarioArchivo, contrasenaArchivo, rol;
-            int intentos;
+      string linea;
+      while (getline(archivo, linea)) {
+        istringstream iss(linea);
+        string usuarioArchivo, contrasenaArchivo, rol;
+        int intentos;
 
-            if (getline(iss, usuarioArchivo, '|') &&
-                getline(iss, contrasenaArchivo, '|') &&
-                getline(iss, rol, '|') &&
-                (iss >> intentos)) {
-                if (usuarioArchivo == usuario) {
-                    // Restablecer el contador de intentos a 0
-                    intentos = 0;
-                }
-                archivoTemp << usuarioArchivo << "|" << contrasenaArchivo << "|" << rol << "|" << intentos << endl;
-            } else {
-                archivoTemp << linea << endl;
-            }
+        if (getline(iss, usuarioArchivo, '|') &&
+          getline(iss, contrasenaArchivo, '|') &&
+          getline(iss, rol, '|') &&
+          (iss >> intentos)) {
+          if (usuarioArchivo == usuario) {
+            // Restablecer el contador de intentos a 0
+            intentos = 0;
+          }
+          archivoTemp << usuarioArchivo << "|" << contrasenaArchivo << "|" << rol << "|" << intentos << endl;
+        } else {
+          archivoTemp << linea << endl;
         }
-        archivo.close();
-        archivoTemp.close();
+      }
+      archivo.close();
+      archivoTemp.close();
     }
-}
+  }
 
-void MenuPrincipal() {
+  //!MENU
+  void MenuPrincipal() {
     while (true) {
-        if (rolUsuario == "ADMIN") {
-            // Menú para el rol de administrador
-            Enviar("\nMenu Principal (Rol: ADMIN):\n1. Traductor\n2. Insertar Nueva Traduccion\n3. Submenú Usuarios\n4. Opcion 4\n5. Salir");
-            string opcion = Recibir();
-            if (opcion.empty()) break; // El cliente se ha desconectado, sale del bucle
-            if (opcion == "1") Traductor();
-            if (opcion == "2") InsertarNuevaTraduccion();
-            if (opcion == "3") SubmenuUsuarios();
-            if (opcion == "4") Enviar("Función todavía no implementada");
-            if (opcion == "5") break;
-            else Enviar("Inserte una opción válida (1-5)");
-        }
+      if (rolUsuario == "ADMIN") {
+        // Menú para el rol de administrador
+        Enviar("\nMenu Principal (Rol: ADMIN):\n1. Traductor\n2. Insertar Nueva Traduccion\n3. Submenu Usuarios\n4. Opcion 4\n5. Salir");
+        string opcion = Recibir();
+        if (opcion.empty()) break; // El cliente se ha desconectado, sale del bucle
+        if (opcion == "1") Traductor();
+        if (opcion == "2") InsertarNuevaTraduccion();
+        if (opcion == "3") SubmenuUsuarios();
+        if (opcion == "4") Enviar("Función todavía no implementada");
+        if (opcion == "5") break;
+        else Enviar("Inserte una opción válida (1-5)");
+      }
 
-        if (rolUsuario == "CONSULTA") {
-            // Menú para el rol de consulta
-            Enviar("\nMenu Principal (Rol: CONSULTA):\n1. Traductor\n2. Salir");
-            string opcion = Recibir();
-            if (opcion.empty()) break; // El cliente se ha desconectado, sale del bucle
-            if (opcion == "1") Traductor();
-            if (opcion == "2") break;
-            else Enviar("Inserte una opcion valida (1-2)");
-        }
+      if (rolUsuario == "CONSULTA") {
+        // Menú para el rol de consulta
+        Enviar("\nMenu Principal (Rol: CONSULTA):\n1. Traductor\n2. Salir");
+        string opcion = Recibir();
+        if (opcion.empty()) break; // El cliente se ha desconectado, sale del bucle
+        if (opcion == "1") Traductor();
+        if (opcion == "2") break;
+        else Enviar("Inserte una opcion valida (1-2)");
+      }
 
-}
+    }
 
-}
+  }
 };
 
 int main() {
-    Server* Servidor = new Server();
-    while (true) {
-        if(Servidor->AceptarCliente()){
-            Servidor->MenuPrincipal();
-        }
+  Server * Servidor = new Server();
+  while (true) {
+    if (Servidor -> AceptarCliente()) {
+      Servidor -> MenuPrincipal();
     }
-    delete Servidor;
-    return 0;
+  }
+  delete Servidor;
+  return 0;
 }
