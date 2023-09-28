@@ -1,4 +1,3 @@
 admin|ryc@UNLa.2023|ADMIN|1
-carlos|abc123|CONSULTA|3
 roberto|123abc|CONSULTA|0
 romina|romunalda|CONSULTA|0
