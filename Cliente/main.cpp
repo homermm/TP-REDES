@@ -92,9 +92,8 @@ int main() {
 
   Client * Cliente = new Client(serverIP.c_str(), serverPort, usuario.c_str(), contrasena.c_str());
 
-  Cliente -> Recibir(); // mensaje de autenticacion correcta
-  //system("cls"); // limpio el inicio de sesion
-  Cliente -> Recibir(); // recibo menu
+  system("cls"); // limpio el inicio de sesion
+  Cliente -> Recibir(); // mensaje de autenticacion correcta + menu
 
   while (true) {
     string opcion;

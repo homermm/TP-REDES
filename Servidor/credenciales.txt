@@ -1,4 +1,4 @@
 test|test|ADMIN|1
-homer|homer|CONSULTA|5
-jaja|jaja|CONSULTA|0
+homer|homer|CONSULTA|13
+jaja|jaja|CONSULTA|1
 hola|hola|CONSULTA|0
