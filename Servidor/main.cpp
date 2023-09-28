@@ -443,10 +443,33 @@ void RestablecerIntentos(const string & usuario) {
     }
 }
 
+ void MenuPrincipal() {
+        while (true) {
+            Enviar("\nMenú Principal:\n1. Traductor\n2. Insertar Nueva Traducción\n3. Submenú Usuarios\n4. Opción 4\n5. Salir");
+            string opcion = Recibir();
+
+            if (opcion.empty()) break; // El cliente se ha desconectado, sale del bucle
+
+            if (opcion == "1") {
+                Traductor();
+            } else if (opcion == "2") {
+                InsertarNuevaTraduccion();
+            } else if (opcion == "3") {
+                SubmenuUsuarios();
+            } else if (opcion == "4") {
+                Enviar("Función todavía no implementada");
+            } else if (opcion == "5") {
+                Enviar("Desconexión del cliente.");
+                break;
+            } else {
+                Enviar("Inserte una opción válida (1-5)");
+            }
+        }
+    }
 
 };
 
-int main() {
+/*int main() {
     Server* Servidor = new Server();
     while (true) {
         if(Servidor->AceptarCliente()){
@@ -464,6 +487,17 @@ int main() {
             }
         }
 
+    }
+    delete Servidor;
+    return 0;
+}*/
+
+int main() {
+    Server* Servidor = new Server();
+    while (true) {
+        if(Servidor->AceptarCliente()){
+            Servidor->MenuPrincipal();
+        }
     }
     delete Servidor;
     return 0;

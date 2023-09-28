@@ -1,3 +1,4 @@
 test|test|ADMIN|0
 homer|homer|CONSULTA|0
 jaja|jaja|CONSULTA|0
+hola|hola|CONSULTA|0

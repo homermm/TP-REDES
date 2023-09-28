@@ -71,16 +71,6 @@ class Client {
     cout << "Socket cerrado." << endl << endl;
   }
 
-  void MostrarMenu() {
-    system("cls");
-    cout << "Menu de Opciones" << endl;
-    cout << "1. Traducir" << endl;
-    cout << "2. Nueva traducción" << endl;
-    cout << "3. Usuarios" << endl;
-    cout << "4. Ver registro de actividades" << endl;
-    cout << "5. Cerrar sesión" << endl;
-  }
-
   ~Client() {
     closesocket(server);
     WSACleanup();
@@ -105,15 +95,17 @@ int main() {
   cin.ignore(); // Limpia el buffer de entrada
 
   Client * Cliente = new Client(serverIP.c_str(), serverPort, usuario.c_str(), contrasena.c_str());
-  Cliente -> MostrarMenu();
+
   Cliente -> Recibir(); //mensaje de autenticacion correcta
+  system("cls"); //limpio el inicio de sesion
+  Cliente -> Recibir(); // recibo menu
 
   while (true) {
     string opcion;
     getline(cin, opcion);
 
     Cliente -> Enviar(opcion);
-    if (opcion == "/salir") Cliente -> MostrarMenu();
+    if (opcion == "/salir") system("cls"); //borro la consola para luego recibir el menu desde el servidor
 
     Cliente -> Recibir();
   }
