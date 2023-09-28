@@ -1,4 +1,4 @@
-test|test|ADMIN|1
-homer|homer|CONSULTA|13
-jaja|jaja|CONSULTA|1
-hola|hola|CONSULTA|0
+admin|ryc@UNLa.2023|ADMIN|1
+carlos|abc123|CONSULTA|3
+roberto|123abc|CONSULTA|0
+romina|romunalda|CONSULTA|0

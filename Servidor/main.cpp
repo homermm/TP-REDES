@@ -24,12 +24,12 @@ class Server {
 
     serverAddr.sin_addr.s_addr = INADDR_ANY;
     serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(5555);
+    serverAddr.sin_port = htons(5005);
 
     bind(server, (SOCKADDR * ) & serverAddr, sizeof(serverAddr));
     listen(server, 0);
 
-    cout << "Escuchando para conexiones entrantes en el puerto 5555." << endl;
+    cout << "Escuchando para conexiones entrantes en el puerto 5005." << endl;
     RegistrarEvento("=======Inicia Servidor=======");
 
     // Aceptar la conexión del cliente antes de entrar en el bucle principal
@@ -98,55 +98,46 @@ class Server {
     }
   }
   void InsertarNuevaTraduccion() {
-    Enviar("Ingrese nueva traduccion (PalabraIngles:PalabraEspanol):");
-    string nuevaTraduccion = Recibir();
+    Enviar("Ingrese una nueva traducción en el formato palabraEnInglés:traducciónEnEspañol:");
 
-    // Verificar el formato de la nueva traduccion
-    size_t separadorPos = nuevaTraduccion.find(':');
-    if (separadorPos == std::string::npos) {
-      Enviar("No fue posible insertar la traduccion. El formato de insercion debe ser PalabraIngles:PalabraEspanol");
-      return;
-    }
+    while (true) {
+        string nuevaTraduccion = Recibir();
+        if (nuevaTraduccion.empty()) break; // El cliente se ha desconectado, sale del bucle interno
 
-    // Obtener la palabra en ingles y la traduccion
-    string palabraIngles = nuevaTraduccion.substr(0, separadorPos);
-    string traduccion = nuevaTraduccion.substr(separadorPos + 1);
-
-    // Convertir las palabras a min�sculas
-    palabraIngles = ConvertirAMinusculas(palabraIngles);
-    traduccion = ConvertirAMinusculas(traduccion);
-
-    // Verificar si la palabra ya existe en las traducciones
-    ifstream archivo("traducciones.txt");
-    if (archivo.is_open()) {
-      string linea;
-      while (getline(archivo, linea)) {
-        size_t pos = linea.find(":");
-        if (pos != string::npos) {
-          string palabraExistente = linea.substr(0, pos);
-          string traduccionExistente = linea.substr(pos + 1);
-          if (ConvertirAMinusculas(palabraExistente) == palabraIngles) {
-            archivo.close();
-            Enviar("Ya existe una traducci�n para " + palabraIngles + ": " + traduccionExistente);
-            return;
-          }
+        if (nuevaTraduccion == "/salir") {
+            Enviar("Has vuelto al menu principal.");
+            break; // El usuario escribió /salir, sale del bucle interno
         }
-      }
-      archivo.close();
+
+        // Dividir la nueva traducción en palabra en inglés y traducción en español
+        size_t pos = nuevaTraduccion.find(":");
+        if (pos == string::npos) {
+            Enviar("Formato de traduccion incorrecto. Use palabraEnIngles:traduccionEnEspanol.");
+            continue; // Volver a solicitar una nueva traducción
+        }
+
+        string palabraIngles = nuevaTraduccion.substr(0, pos);
+
+        // Verificar si ya existe una traducción para la palabra en inglés
+        string traduccionExistente = BuscarTraduccionEnArchivo(palabraIngles);
+        if (!traduccionExistente.empty()) {
+            Enviar("Ya existe una traduccion para " + palabraIngles + ": " + traduccionExistente);
+        } else {
+            // Agregar la nueva traducción al archivo de traducciones
+            ofstream archivo("traducciones.txt", ios::app);
+            if (archivo.is_open()) {
+                string traduccionEspanol = nuevaTraduccion.substr(pos + 1);
+                archivo << palabraIngles << ":" << traduccionEspanol << endl;
+                archivo.close();
+                Enviar("Nueva traduccion agregada con exito.");
+            } else {
+                Enviar("Error al agregar la nueva traducción.");
+            }
+        }
     }
+}
 
-    // Agregar la nueva traducci�n al archivo en una l�nea separada con salto de l�nea
-    ofstream archivoSalida("traducciones.txt", std::ios::app); // Abre el archivo en modo de apertura al final
-    if (!archivoSalida.is_open()) {
-      Enviar("Error al abrir el archivo de diccionario para insercion.");
-      return;
-    }
 
-    archivoSalida << palabraIngles << ":" << traduccion << std::endl;
-    archivoSalida.close();
-
-    Enviar("Nueva traduccion insertada correctamente");
-  }
 
   //!FUNCIONES AUXILIARES
   string ConvertirAMinusculas(const string & cadena) {

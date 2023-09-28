@@ -1,70 +1,23 @@
-2023-09-28_11:28:06: =======Inicia Servidor=======
-2023-09-28_11:28:22: Inicio de sesión – usuario: test
-2023-09-28_11:28:33: Inicio de sesión – usuario: test
-2023-09-28_11:28:36: Inicio de sesión – usuario: test
-2023-09-28_11:28:38: Cierre de sesión – usuario: ADMIN
-2023-09-28_11:33:04: =======Inicia Servidor=======
-2023-09-28_11:33:12: Inicio de sesión – usuario: test
-2023-09-28_11:33:28: Cierre de sesión – usuario: ADMIN
-2023-09-28_11:34:02: =======Inicia Servidor=======
-2023-09-28_11:34:13: Inicio de sesión – usuario: test
-2023-09-28_11:34:38: Cierre de sesión – usuario: ADMIN
-2023-09-28_11:37:54: =======Inicia Servidor=======
-2023-09-28_11:38:02: Inicio de sesion – usuario: test
-2023-09-28_11:38:09: Cierre de sesion.
-2023-09-28_11:38:13: =======Inicia Servidor=======
-2023-09-28_11:38:21: Inicio de sesion – usuario: test
-2023-09-28_11:38:26: Cierre de sesion.
-2023-09-28_11:38:59: =======Inicia Servidor=======
-2023-09-28_14:58:52: =======Inicia Servidor=======
-2023-09-28_14:59:04: Inicio de sesion – usuario: homer
-2023-09-28_14:59:17: Cierre de sesion.
-2023-09-28_14:59:31: Cierre de sesion.
-2023-09-28_14:59:47: Cierre de sesion.
-2023-09-28_15:02:19: =======Inicia Servidor=======
-2023-09-28_15:02:27: Inicio de sesion – usuario: test
-2023-09-28_15:02:43: Cierre de sesion.
-2023-09-28_15:03:40: Cierre de sesion.
-2023-09-28_15:03:45: =======Inicia Servidor=======
-2023-09-28_15:03:55: Inicio de sesion – usuario: test
-2023-09-28_15:04:26: Cierre de sesion.
-2023-09-28_15:11:22: =======Inicia Servidor=======
-2023-09-28_15:11:41: Inicio de sesion – usuario: test
-2023-09-28_15:11:46: Cierre de sesion.
-2023-09-28_15:11:56: Inicio de sesion – usuario: homer
-2023-09-28_15:12:04: Cierre de sesion.
-2023-09-28_15:12:29: Cierre de sesion.
-2023-09-28_15:12:46: =======Inicia Servidor=======
-2023-09-28_15:12:56: Cierre de sesion.
-2023-09-28_15:13:59: Cierre de sesion.
-2023-09-28_15:14:10: Inicio de sesion – usuario: test
-2023-09-28_15:14:50: Cierre de sesion.
-2023-09-28_15:24:35: =======Inicia Servidor=======
-2023-09-28_15:24:46: Cierre de sesion.
-2023-09-28_15:25:12: Cierre de sesion.
-2023-09-28_15:29:48: =======Inicia Servidor=======
-2023-09-28_15:30:52: Inicio de sesion – usuario: test
-2023-09-28_15:31:31: Cierre de sesion.
-2023-09-28_15:32:33: =======Inicia Servidor=======
-2023-09-28_15:32:54: Inicio de sesion – usuario: test
-2023-09-28_15:33:16: Cierre de sesion.
-2023-09-28_15:33:37: Cierre de sesion.
-2023-09-28_15:34:18: Cierre de sesion.
-2023-09-28_15:34:47: =======Inicia Servidor=======
-2023-09-28_15:34:59: Cierre de sesion.
-2023-09-28_15:35:14: Inicio de sesion – usuario: test
-2023-09-28_15:35:20: Cierre de sesion.
-2023-09-28_15:36:34: Inicio de sesion – usuario: test
-2023-09-28_15:36:46: Cierre de sesion.
-2023-09-28_15:36:54: =======Inicia Servidor=======
-2023-09-28_15:37:03: Inicio de sesion – usuario: test
-2023-09-28_15:37:10: Cierre de sesion.
-2023-09-28_15:37:23: Cierre de sesion.
-2023-09-28_15:37:34: Inicio de sesion – usuario: test
-2023-09-28_15:37:36: Cierre de sesion.
-2023-09-28_15:37:55: =======Inicia Servidor=======
-2023-09-28_15:38:06: Cierre de sesion.
-2023-09-28_15:38:18: Cierre de sesion.
-2023-09-28_15:38:33: Cierre de sesion.
-2023-09-28_15:38:50: Inicio de sesion – usuario: test
-2023-09-28_15:39:53: Cierre de sesion.
+2023-09-28_15:44:22: =======Inicia Servidor=======
+2023-09-28_15:44:32: =======Inicia Servidor=======
+2023-09-28_15:46:26: Cierre de sesion.
+2023-09-28_15:47:00: Inicio de sesion – usuario: admin
+2023-09-28_15:48:40: Cierre de sesion.
+2023-09-28_15:49:13: Inicio de sesion – usuario: admin
+2023-09-28_15:51:54: Cierre de sesion.
+2023-09-28_15:52:06: Inicio de sesion – usuario: admin
+2023-09-28_15:55:13: Inicio de sesion – usuario: carlos
+2023-09-28_15:56:50: Cierre de sesion.
+2023-09-28_15:57:25: Cierre de sesion.
+2023-09-28_15:57:49: Cierre de sesion.
+2023-09-28_15:58:36: Inicio de sesion – usuario: admin
+2023-09-28_16:00:07: Cierre de sesion.
+2023-09-28_16:00:28: Inicio de sesion – usuario: admin
+2023-09-28_16:06:36: =======Inicia Servidor=======
+2023-09-28_16:06:53: Inicio de sesion – usuario: admin
+2023-09-28_16:10:57: =======Inicia Servidor=======
+2023-09-28_16:11:34: Inicio de sesion – usuario: admin
+2023-09-28_16:13:27: Cierre de sesion.
+2023-09-28_16:22:07: =======Inicia Servidor=======
+2023-09-28_16:22:31: Inicio de sesion – usuario: admin
+2023-09-28_16:22:53: Cierre de sesion.
