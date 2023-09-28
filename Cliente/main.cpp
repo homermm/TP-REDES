@@ -32,19 +32,17 @@ class Client {
     }
     cout << "Conectado al Servidor!" << endl;
 
+    // Recibir respuesta del servidor para el usuario
+    Recibir();
+
     // Enviar el usuario al servidor
     Enviar(usuario);
 
-    // Recibir respuesta del servidor para el usuario
-    string respuestaUsuario = Recibir();
-    cout << respuestaUsuario << endl;
+    // Recibir respuesta del servidor para la contraseña
+    Recibir();
 
     // Enviar la contraseña al servidor
     Enviar(contrasena);
-
-    // Recibir respuesta del servidor para la contraseña
-    string respuestaContrasena = Recibir();
-    cout << respuestaContrasena << endl;
   }
 
   void Enviar(const string & mensaje) {
@@ -95,7 +93,7 @@ int main() {
   Client * Cliente = new Client(serverIP.c_str(), serverPort, usuario.c_str(), contrasena.c_str());
 
   Cliente -> Recibir(); // mensaje de autenticacion correcta
-  system("cls"); // limpio el inicio de sesion
+  //system("cls"); // limpio el inicio de sesion
   Cliente -> Recibir(); // recibo menu
 
   while (true) {
