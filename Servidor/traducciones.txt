@@ -1,4 +1,4 @@
+
 university:universidad
-dog:perro
+DOG:perro
 cat:gato
-dog:perro

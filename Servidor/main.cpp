@@ -120,7 +120,8 @@ class Server {
 
         // Verificar si ya existe una traducción para la palabra en inglés
         string traduccionExistente = BuscarTraduccionEnArchivo(palabraIngles);
-        if (!traduccionExistente.empty()) {
+
+        if (traduccionExistente !="No fue posible encontrar la traducci�n para:" + palabraIngles) {
             Enviar("Ya existe una traduccion para " + palabraIngles + ": " + traduccionExistente);
         } else {
             // Agregar la nueva traducción al archivo de traducciones
@@ -353,100 +354,105 @@ class Server {
 
   void ListarUsuariosBloqueados() {
     ifstream archivo("credenciales.txt");
-    ofstream archivoTemp("credenciales_temp.txt");
-    vector<string> usuariosBloqueados; // Vector para almacenar usuarios bloqueados
-
-    if (archivo.is_open() && archivoTemp.is_open()) {
-        string linea;
-        while (getline(archivo, linea)) {
-            istringstream iss(linea);
-            string usuarioArchivo, contrasenaArchivo, rol;
-            int intentos;
-
-            if (getline(iss, usuarioArchivo, '|') &&
-                getline(iss, contrasenaArchivo, '|') &&
-                getline(iss, rol, '|') &&
-                (iss >> intentos)) {
-                if (intentos >= 3) {
-                    usuariosBloqueados.push_back(usuarioArchivo); // Agregar usuario bloqueado al vector
-                } else {
-                    archivoTemp << linea << endl; // Conservar usuarios no bloqueados en el archivo temporal
-                }
-            }
-        }
-        archivo.close();
-        archivoTemp.close();
-
-        string mensaje = ""; // Cadena para almacenar el mensaje completo
-
-        if (!usuariosBloqueados.empty()) {
-            mensaje += "\nUsuarios bloqueados:\n";
-            for (const string& usuarioBloqueado : usuariosBloqueados) {
-                mensaje += usuarioBloqueado + "\n";
-            }
-
-            mensaje += "Escriba /salir para volver al submenu de usuarios o ingrese el nombre de usuario que desea desbloquear:";
-        } else {
-            mensaje += "No se encontraron usuarios bloqueados.";
-            mensaje += "Escriba /salir para volver al submenu de usuarios:";
-        }
-
-        Enviar(mensaje); // Enviar el mensaje completo
-
-        // Esperar la respuesta del cliente y realizar la acción correspondiente
-        string respuesta = Recibir();
-        if (!respuesta.empty()) {
-            if (respuesta == "/salir") {
-                Enviar("Has vuelto al submenu de usuarios.\nSubmenu Usuarios\n1. Alta\n2. Desbloqueo\nEscriba /salir para volver al menu principal");
-            } else if (!usuariosBloqueados.empty()) {
-                // Verificar si el nombre de usuario está en la lista de usuarios bloqueados
-                auto it = find(usuariosBloqueados.begin(), usuariosBloqueados.end(), respuesta);
-                if (it != usuariosBloqueados.end()) {
-                    // Restablecer intentos a 0
-                    RestablecerIntentos(respuesta);
-                    Enviar(respuesta + " desbloqueado correctamente");
-                } else {
-                    Enviar("El usuario " + respuesta + " no se encuentra bloqueado.");
-                }
-            }
-        }
-
-        remove("credenciales.txt");
-        rename("credenciales_temp.txt", "credenciales.txt"); // Actualizar el archivo de credenciales
+    if (!archivo.is_open()) {
+        // Error al abrir el archivo.
+        return;
     }
-}
 
+    // Crea un vector para almacenar los usuarios bloqueados.
+    vector<string> usuariosBloqueados;
 
-
-
-  void RestablecerIntentos(const string & usuario) {
-    ifstream archivo("credenciales.txt");
-    ofstream archivoTemp("credenciales_temp.txt");
-
-    if (archivo.is_open() && archivoTemp.is_open()) {
-      string linea;
-      while (getline(archivo, linea)) {
+    // Lee el archivo de credenciales.
+    string linea;
+    while (getline(archivo, linea)) {
+        // Parsea la línea del archivo.
         istringstream iss(linea);
         string usuarioArchivo, contrasenaArchivo, rol;
         int intentos;
 
         if (getline(iss, usuarioArchivo, '|') &&
-          getline(iss, contrasenaArchivo, '|') &&
-          getline(iss, rol, '|') &&
-          (iss >> intentos)) {
-          if (usuarioArchivo == usuario) {
-            // Restablecer el contador de intentos a 0
-            intentos = 0;
-          }
-          archivoTemp << usuarioArchivo << "|" << contrasenaArchivo << "|" << rol << "|" << intentos << endl;
-        } else {
-          archivoTemp << linea << endl;
+            getline(iss, contrasenaArchivo, '|') &&
+            getline(iss, rol, '|') &&
+            (iss >> intentos)) {
+            // Si el número de intentos es mayor o igual a 3, el usuario está bloqueado.
+            if (intentos >= 3) {
+                usuariosBloqueados.push_back(usuarioArchivo);
+            }
         }
-      }
-      archivo.close();
-      archivoTemp.close();
     }
-  }
+
+    archivo.close(); // Cerrar el archivo después de la lectura.
+
+    string mensaje = ""; // Cadena para almacenar el mensaje completo
+
+    if (!usuariosBloqueados.empty()) {
+        mensaje += "\nUsuarios bloqueados:\n";
+        for (const string& usuarioBloqueado : usuariosBloqueados) {
+            mensaje += usuarioBloqueado + "\n";
+        }
+        mensaje += "Escriba /salir para volver al submenu de usuarios o ingrese el nombre de usuario que desea desbloquear:";
+        Enviar(mensaje); // Enviar el mensaje completo
+        string respuesta = Recibir();
+
+        if (respuesta == "/salir") {
+            Enviar("Has vuelto al submenu de usuarios.\nSubmenu Usuarios\n1. Alta\n2. Desbloqueo\nEscriba /salir para volver al menu principal");
+        } else {
+            auto it = find(usuariosBloqueados.begin(), usuariosBloqueados.end(), respuesta);
+            if (it != usuariosBloqueados.end()) {
+                // Restablecer intentos a 0
+                RestablecerIntentos(respuesta);
+                Enviar(respuesta + " desbloqueado correctamente");
+            } else {
+                Enviar("El usuario " + respuesta + " no se encuentra bloqueado.");
+            }
+        }
+    } else {
+        Enviar("No se encontraron usuarios bloqueados. Escriba /salir para volver al submenu de usuarios:");
+    }
+}
+
+void RestablecerIntentos(const string& nombreUsuario) {
+    // Abre el archivo de credenciales.
+    ifstream archivoEntrada("credenciales.txt");
+    if (!archivoEntrada.is_open()) {
+        // Error al abrir el archivo.
+        return;
+    }
+
+    // Crea un archivo temporal para almacenar las credenciales actualizadas.
+    ofstream archivoSalida("credenciales_temp.txt");
+
+    // Lee el archivo de credenciales.
+    string linea;
+    while (getline(archivoEntrada, linea)) {
+        // Parsea la línea del archivo.
+        istringstream iss(linea);
+        string usuarioArchivo, contrasenaArchivo, rol;
+        int intentos;
+
+        if (getline(iss, usuarioArchivo, '|') &&
+            getline(iss, contrasenaArchivo, '|') &&
+            getline(iss, rol, '|') &&
+            (iss >> intentos)) {
+            // Si el nombre de usuario coincide, establece el número de intentos a 0.
+            if (usuarioArchivo == nombreUsuario) {
+                intentos = 0;
+            }
+
+            // Escribe la línea actualizada en el archivo temporal.
+            archivoSalida << usuarioArchivo << '|' << contrasenaArchivo << '|' << rol << '|' << intentos << endl;
+        }
+    }
+
+    // Cierra los archivos.
+    archivoEntrada.close();
+    archivoSalida.close();
+
+    // Elimina el archivo de credenciales original y renombra el archivo temporal.
+    remove("credenciales.txt");
+    rename("credenciales_temp.txt", "credenciales.txt");
+}
+
 
   //!MENU
   void MenuPrincipal() {
