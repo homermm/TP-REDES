@@ -71,6 +71,21 @@ class Client {
     closesocket(server);
     WSACleanup();
   }
+  void MostrarRegistroActividades() {
+    while (true) {
+        string linea = Recibir();
+
+        if (linea.empty()) {
+            cout << "Error al recibir el registro de actividades." << endl;
+            break;
+        }
+
+        if (linea == "FIN_DEL_REGISTRO") {
+            cout << "Registro de actividades completado." << endl;
+            break;
+        }
+    }
+}
 };
 
 int main() {
@@ -101,6 +116,7 @@ int main() {
     Cliente -> Enviar(opcion);
 
     if (opcion == "/salir") system("cls"); // borro la consola para luego recibir el menu desde el servidor
+    if (opcion == "4") Cliente->MostrarRegistroActividades();
 
     Cliente -> Recibir();
   }
