@@ -507,16 +507,14 @@ void EnviarRegistroActividades() {
         return;
     }
 
-    stringstream logContent;
     string linea;
     while (getline(logFile, linea)) {
-        logContent << linea << endl; // Lee y concatena cada línea del archivo
+        Enviar(linea); // Envía cada línea del registro como un mensaje separado
     }
 
     logFile.close();
-
-    string contenidoCompleto = logContent.str();
-    Enviar(contenidoCompleto); // Envía todo el contenido del archivo como un solo mensaje
+    // Envía un mensaje especial para indicar que se han enviado todas las líneas
+    Enviar("FIN_DEL_REGISTRO");
 }
 
 

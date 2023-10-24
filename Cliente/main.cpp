@@ -117,7 +117,7 @@ int main() {
 
     if (opcion == "/salir") system("cls"); // borro la consola para luego recibir el menu desde el servidor
     if (opcion == "4") Cliente->MostrarRegistroActividades();
-
+    printf("\n");
     Cliente -> Recibir();
   }
 

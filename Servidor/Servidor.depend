@@ -9,3 +9,13 @@
 	<vector>
 	<ctime>
 
+1698120466 source:c:\users\homer\desktop\facu\redes\redes\servidor\main.cpp
+	<iostream>
+	<cstring>
+	<winsock2.h>
+	<fstream>
+	<algorithm>
+	<sstream>
+	<vector>
+	<ctime>
+
